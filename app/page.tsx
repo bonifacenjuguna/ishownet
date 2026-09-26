@@ -25,7 +25,6 @@ import {
   LocationIcon,
   PacketLossIcon,
   PlayIcon,
-  PulseIcon,
   RefreshIcon,
   TrashIcon,
   UploadIcon,
