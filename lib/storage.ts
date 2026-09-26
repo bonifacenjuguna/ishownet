@@ -1,6 +1,6 @@
 import type { TestResult } from './types';
 
-const KEY = 'speednet:history:v1';
+const KEY = 'ishownet:history:v1';
 const MAX_ENTRIES = 20;
 
 export function loadHistory(): TestResult[] {

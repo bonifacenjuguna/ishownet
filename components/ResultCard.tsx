@@ -33,13 +33,12 @@ async function drawCard(canvas: HTMLCanvasElement, result: TestResult, unit: Spe
 
   ctx.fillStyle = '#c6813f';
   ctx.font = '600 34px "Instrument Sans", sans-serif';
-  ctx.fillText('SPEEDNETT', 80, 130);
+  ctx.fillText('ISHOWNET', 80, 130);
 
   ctx.fillStyle = '#8b8a8f';
   ctx.font = '400 24px "Instrument Sans", sans-serif';
   ctx.fillText(new Date(result.timestamp).toLocaleString(), 80, 168);
 
-  // Big download number
   ctx.fillStyle = '#f3f1ec';
   ctx.font = '600 160px "IBM Plex Mono", monospace';
   ctx.fillText(formatSpeed(result.downloadMbps, unit, 1), 80, 420);
@@ -92,10 +91,6 @@ export default function ResultCard({ result, unit }: ResultCardProps) {
   const [copied, setCopied] = useState(false);
   const [rendered, setRendered] = useState(false);
 
-  // This component doesn't remount between tests (same position in the tree),
-  // so without this the canvas from the FIRST test would stay cached — a
-  // retest's "Save result card" could silently download a PNG with the
-  // previous run's numbers on it.
   useEffect(() => {
     setRendered(false);
   }, [result.id]);
@@ -112,13 +107,13 @@ export default function ResultCard({ result, unit }: ResultCardProps) {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const link = document.createElement('a');
-    link.download = `speednett-${result.id.slice(0, 8)}.png`;
+    link.download = `ishownet-${result.id.slice(0, 8)}.png`;
     link.href = canvas.toDataURL('image/png');
     link.click();
   }
 
   async function handleCopyLink() {
-    const summary = `Speednett result: ${formatSpeed(result.downloadMbps, unit)} ${unit} down / ${formatSpeed(
+    const summary = `iShowNet result: ${formatSpeed(result.downloadMbps, unit)} ${unit} down / ${formatSpeed(
       result.uploadMbps,
       unit
     )} ${unit} up, ${formatMs(result.pingMs)}ms ping (${result.regionLabel})`;

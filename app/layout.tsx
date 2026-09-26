@@ -16,8 +16,22 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Speednett — internet speed test',
-  description: 'A fast, animated internet speed test: ping, jitter, download, upload, and bufferbloat, measured for real.',
+  metadataBase: new URL('https://ishownet.vercel.app'),
+  title: 'iShowNet — Internet Speed Test',
+  description: 'iShowNet is a fast, animated internet speed test measuring ping, jitter, packet loss, download, upload, and bufferbloat.',
+  applicationName: 'iShowNet',
+  openGraph: {
+    title: 'iShowNet — Internet Speed Test',
+    description: 'Measure your internet connection with iShowNet.',
+    url: 'https://ishownet.vercel.app',
+    siteName: 'iShowNet',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'iShowNet — Internet Speed Test',
+    description: 'Measure your internet connection with iShowNet.',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -25,10 +39,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <head>
         <script
-          // Runs before paint so the stored theme applies immediately,
-          // instead of flashing dark and then switching to light.
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('speednett-theme')||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('ishownet-theme')||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`,
           }}
         />
       </head>

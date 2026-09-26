@@ -15,7 +15,7 @@ export default function Header({ unit, onUnitChange }: HeaderProps) {
   return (
     <header className="header">
       <div className="container header-inner">
-        <a href="#test" className="header-brand" aria-label="Speednett home">
+        <a href="#test" className="header-brand" aria-label="iShowNet home">
           <Logo />
         </a>
 

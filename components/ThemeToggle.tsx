@@ -5,11 +5,9 @@ import { MoonIcon, SunIcon } from './icons';
 
 type Theme = 'dark' | 'light';
 
-const STORAGE_KEY = 'speednett-theme';
+const STORAGE_KEY = 'ishownet-theme';
 
 export default function ThemeToggle() {
-  // Starts null so the button renders inert until it has read the real
-  // preference on mount — avoids a server/client markup mismatch.
   const [theme, setTheme] = useState<Theme | null>(null);
 
   useEffect(() => {
@@ -27,12 +25,8 @@ export default function ThemeToggle() {
   }
 
   return (
-    <button
-      type="button"
-      className="theme-toggle"
-      onClick={toggle}
-      aria-label={theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'}
-    >
+    <button type="button" className="theme-toggle" onClick={toggle}
+      aria-label={theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'}>
       <SunIcon className="icon-sun" width={17} height={17} />
       <MoonIcon className="icon-moon" width={17} height={17} />
     </button>
