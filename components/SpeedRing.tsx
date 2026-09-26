@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
 import { formatSpeed, type SpeedUnit } from '@/lib/format';
 
 interface SpeedRingProps {
@@ -30,46 +29,10 @@ function fraction(mbps: number): number {
   return Math.max(0, Math.min(1, Math.log10(1 + mbps) / Math.log10(1 + cap)));
 }
 
-function useEasedNumber(target: number, snapKey: string): number {
-  const [value, setValue] = useState(0);
-  const valueRef = useRef(0);
-  const targetRef = useRef(target);
-  const keyRef = useRef(snapKey);
-  targetRef.current = target;
-
-  useEffect(() => {
-    if (keyRef.current !== snapKey) {
-      keyRef.current = snapKey;
-      valueRef.current = targetRef.current;
-      setValue(targetRef.current);
-    }
-  }, [snapKey]);
-
-  useEffect(() => {
-    let raf = 0;
-    const tick = () => {
-      const diff = targetRef.current - valueRef.current;
-      if (Math.abs(diff) < 0.01) {
-        if (valueRef.current !== targetRef.current) {
-          valueRef.current = targetRef.current;
-          setValue(valueRef.current);
-        }
-      } else {
-        valueRef.current += diff * 0.14;
-        setValue(valueRef.current);
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, []);
-
-  return value;
-}
-
 export default function SpeedRing({ down, up, centerMbps, snapKey, unit, label, scanning, running, priming }: SpeedRingProps) {
-  const shown = useEasedNumber(centerMbps, snapKey);
-  const display = formatSpeed(shown, unit, 1);
+  // centerMbps is already the shared synchronized presentation value.
+  // The ring must not apply a second independent animation layer.
+  const display = formatSpeed(centerMbps, unit, 1);
 
   return (
     <div className={`ring-wrap ${running ? 'is-running' : ''}`} role="img" aria-label={priming ? label : `${label}: ${display} ${unit}`}>
