@@ -43,6 +43,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="canonical" href="https://ishownet.vercel.app" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebApplication',
+              name: 'iShowNet',
+              url: 'https://ishownet.vercel.app',
+              description:
+                'A browser-based internet speed and connection quality test for download, upload, ping, jitter, packet loss and bufferbloat.',
+              applicationCategory: 'UtilitiesApplication',
+              operatingSystem: 'Web Browser',
+              browserRequirements: 'Requires JavaScript and a modern web browser.',
+              isAccessibleForFree: true,
+            }),
+          }}
+        />
         <script
           id="theme-init"
           dangerouslySetInnerHTML={{
