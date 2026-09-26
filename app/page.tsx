@@ -142,11 +142,11 @@ export default function Home() {
         onStage: (stage, value, extra) => {
           if (stage === 'ping') setPing({ ms: value, jitter: extra ?? 0 });
           if (stage === 'download') {
-            downMetric.setTarget(value);
+            downMetric.setTarget(value, true);
             setDownLocked(true);
           }
           if (stage === 'upload') {
-            upMetric.setTarget(value);
+            upMetric.setTarget(value, true);
             setUpLocked(true);
           }
         },
@@ -163,8 +163,8 @@ export default function Home() {
         },
       });
       setResult(finalResult);
-      downMetric.setTarget(finalResult.downloadMbps);
-      upMetric.setTarget(finalResult.uploadMbps);
+      downMetric.setTarget(finalResult.downloadMbps, true);
+      upMetric.setTarget(finalResult.uploadMbps, true);
       setHistory(saveResult(finalResult));
       setPhase('done');
     } catch (e) {
