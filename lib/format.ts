@@ -63,6 +63,12 @@ export function buildActivities(r: { down: number; up: number; ping: number; jit
   const pick = (great: boolean, ok: boolean): Level => (great ? 'great' : ok ? 'ok' : 'poor');
   return [
     {
+      id: 'social',
+      name: 'Social & messaging',
+      need: 'Chats, posts, reels, stories & DMs',
+      level: pick(down >= 10 && up >= 5 && ping < 150 && loss < 2, down >= 3 && up >= 1.5 && ping < 250 && loss < 5),
+    },
+    {
       id: 'calls',
       name: 'Video calls',
       need: 'Zoom, Meet, Teams in HD',
