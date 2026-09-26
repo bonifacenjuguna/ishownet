@@ -45,6 +45,7 @@ import {
   type SpeedUnit,
 } from '@/lib/format';
 import type { MetaInfo, TestPhase, TestResult } from '@/lib/types';
+import { useSynchronizedMetric } from '@/hooks/useSynchronizedMetric';
 
 type Focus = 'download' | 'upload';
 
@@ -67,10 +68,13 @@ export default function Home() {
   const [runId, setRunId] = useState(0);
   const [focus, setFocus] = useState<Focus>('download');
 
-  // Live values. `down` / `up` hold the smoothed number while measuring and
-  // are then locked to the final result, so nothing ever falls back to zero.
-  const [down, setDown] = useState(0);
-  const [up, setUp] = useState(0);
+  // One presentation signal per direction. The engine supplies real targets;
+  // this layer only interpolates between them. The dial, number and waveform
+  // all consume the same synchronized value.
+  const downMetric = useSynchronizedMetric(0, { tauMs: 320 });
+  const upMetric = useSynchronizedMetric(0, { tauMs: 320 });
+  const down = downMetric.value;
+  const up = upMetric.value;
   const [ping, setPing] = useState<{ ms: number; jitter: number } | null>(null);
   const [downSeries, setDownSeries] = useState<number[]>([]);
   const [upSeries, setUpSeries] = useState<number[]>([]);
@@ -86,7 +90,22 @@ export default function Home() {
   const [showIp, setShowIp] = useState(false);
 
   const runningRef = useRef(false);
-  const emaRef = useRef(0);
+  const downLiveRef = useRef(0);
+  const upLiveRef = useRef(0);
+  downLiveRef.current = down;
+  upLiveRef.current = up;
+
+  useEffect(() => {
+    if (phase !== 'download' && phase !== 'upload') return;
+    const timer = window.setInterval(() => {
+      if (phase === 'download') {
+        setDownSeries((s) => [...s.slice(-120), downLiveRef.current]);
+      } else {
+        setUpSeries((s) => [...s.slice(-120), upLiveRef.current]);
+      }
+    }, 120);
+    return () => window.clearInterval(timer);
+  }, [phase]);
 
   useEffect(() => {
     setHistory(loadHistory());
@@ -104,8 +123,8 @@ export default function Home() {
     setResult(null);
     setError(null);
     setFocus('download');
-    setDown(0);
-    setUp(0);
+    downMetric.reset(0);
+    upMetric.reset(0);
     setPing(null);
     setDownSeries([]);
     setUpSeries([]);
@@ -113,13 +132,13 @@ export default function Home() {
     setUpLocked(false);
     setPrimed({ download: false, upload: false });
     setPhase('ping');
-    emaRef.current = 0;
+    downMetric.reset(0);
+    upMetric.reset(0);
 
     try {
       const finalResult = await runFullTest({
         onPhase: (p) => {
           setPhase(p);
-          emaRef.current = 0; // each transfer starts its own smoothing window
         },
         onPingLive: (avgMs, jitterMs) => {
           // Counts up toward the real number as each round trip comes back,
@@ -129,32 +148,29 @@ export default function Home() {
         onStage: (stage, value, extra) => {
           if (stage === 'ping') setPing({ ms: value, jitter: extra ?? 0 });
           if (stage === 'download') {
-            setDown(value);
+            downMetric.setTarget(value);
             setDownLocked(true);
           }
           if (stage === 'upload') {
-            setUp(value);
+            upMetric.setTarget(value);
             setUpLocked(true);
           }
         },
         onLive: (kind, mbps) => {
-          // Exponential moving average: the dial can drift up and down, but
-          // it follows the trend instead of jumping to individual samples.
-          emaRef.current = emaRef.current === 0 ? mbps : emaRef.current * 0.7 + mbps * 0.3;
+          // Every movement originates from a real engine sample. The frontend
+          // never invents a number; it only interpolates between real targets.
           if (kind === 'download') {
-            setDown(emaRef.current);
-            setDownSeries((s) => [...s.slice(-120), mbps]);
+            downMetric.setTarget(mbps);
             setPrimed((p) => (p.download ? p : { ...p, download: true }));
           } else {
-            setUp(emaRef.current);
-            setUpSeries((s) => [...s.slice(-120), mbps]);
+            upMetric.setTarget(mbps);
             setPrimed((p) => (p.upload ? p : { ...p, upload: true }));
           }
         },
       });
       setResult(finalResult);
-      setDown(finalResult.downloadMbps);
-      setUp(finalResult.uploadMbps);
+      downMetric.setTarget(finalResult.downloadMbps);
+      upMetric.setTarget(finalResult.uploadMbps);
       setHistory(saveResult(finalResult));
       setPhase('done');
     } catch (e) {
