@@ -7,10 +7,10 @@ A real, animated internet speed test for measuring ping, jitter, packet loss, do
 ## What it measures
 
 - **Ping / jitter** — real round trips against an Edge Function that returns `204` instantly. The first ping is discarded because it pays for DNS/TLS setup, not real latency.
-- **Download / upload** — real transfers. Download streams random (incompressible) bytes from an Edge Function across 4 parallel connections; upload sends random payloads via `XMLHttpRequest` across 3 parallel connections. The first ~1.5s of each transfer (TCP slow-start) is excluded from the final number.
+- **Download / upload** — real transfers. Download requests a fixed 16 MiB random (incompressible) payload from an Edge Function across adaptive parallel connections; upload sends random payloads via `XMLHttpRequest` across 3 parallel connections. The first ~1.5s of each transfer (TCP slow-start) is excluded from the final number.
 - **Bufferbloat** — idle ping is measured first, then ping is measured again while download and upload saturate the link. The increase is graded A–F using thresholds similar to common bufferbloat testing tools. This is a proxy, not a lab-grade measurement.
 - **Packet loss** — approximated as the percentage of ping requests that time out or fail. HTTP/TCP cannot see raw UDP packet loss, so treat this as an estimate.
-- **IP / location** — IP and city/country come from Vercel edge geolocation headers.
+- **IP / location** — IP and city/country come from Vercel edge geolocation headers. The network identifier is exposed as an ASN, not an ISP name.
 - **Network type** — read from the browser's `navigator.connection` API where available. Safari and Firefox may fall back to "Not reported".
 - **History / trend graph** — stored in `localStorage` only. Nothing is sent to a server; clearing browser data clears the history.
 
@@ -60,6 +60,7 @@ components/
 lib/
   engine.ts             test orchestration
   edgeHandlers.ts       Edge Runtime handlers
+  constants.ts          shared measurement protocol constants
   format.ts             formatting and activity logic
   storage.ts             local history
   types.ts               shared TypeScript types
