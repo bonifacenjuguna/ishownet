@@ -1,2 +1,0 @@
-# ishownet
-Internet Speed Test
