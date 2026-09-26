@@ -56,13 +56,18 @@
   --brand-contrast: #ffffff;
 }
 
+[data-accent='red'] {
+  --brand-rgb: 239, 35, 60;
+  --brand: #ef233c;
+  --brand-deep: #b91c2e;
+  --brand-wash: rgba(var(--brand-rgb), 0.14);
+  --brand-contrast: #ffffff;
+}
+
 [data-theme='light'][data-accent='copper'] {
   --brand-wash: rgba(var(--brand-rgb), 0.18);
 }
 
-[data-theme='light'][data-accent='purple'] {
-  --brand-wash: rgba(var(--brand-rgb), 0.18);
-}
 
 * {
   box-sizing: border-box;
