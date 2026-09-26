@@ -507,7 +507,7 @@ export default function Home() {
         </section>
 
 
-        <InstallApp />
+        <InstallApp enabled={Boolean(result)} />
 
         {/* ───────── Search-friendly guide ───────── */}
         <section id="how-it-works" className="container section seo-content">
