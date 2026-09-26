@@ -82,10 +82,6 @@ interface ThroughputResult {
   mbps: number;
   bytes: number;
   trace: TraceSample[];
-  /** How many parallel streams the ramp settled on. */
-  streamsUsed: number;
-  /** Total wall-clock time this measurement actually ran for. */
-  durationMs: number;
 }
 
 /** Time-weighted average of trace samples at/after `cutoffT`. Each sample is weighted
@@ -182,7 +178,6 @@ async function measureAdaptive(
 
   // --- Ramp phase ---
   let prevLevelMbps = 0;
-  let settledStreams = RAMP_LEVELS[0];
   const rampSamples: number[] = [];
 
   for (let i = 0; i < RAMP_LEVELS.length; i++) {
@@ -195,8 +190,6 @@ async function measureAdaptive(
     const elapsedS = (performance.now() - stepStart) / 1000;
     const levelMbps = elapsedS > 0 ? (bytesDelta * 8) / 1e6 / elapsedS : 0;
     rampSamples.push(levelMbps);
-    settledStreams = level;
-
     const grewSignificantly = i === 0 || levelMbps >= prevLevelMbps * (1 + GROWTH_THRESHOLD);
     prevLevelMbps = levelMbps;
     if (!grewSignificantly) break; // diminishing returns from more concurrency — stay right here
@@ -227,7 +220,7 @@ async function measureAdaptive(
   const overall = elapsed > 0 ? (totalBytes * 8) / 1e6 / elapsed : 0;
   const mbps = timeWeightedAverage(trace, settleMarkT, overall);
 
-  return { mbps, bytes: totalBytes, trace, streamsUsed: settledStreams, durationMs: elapsed * 1000 };
+  return { mbps, bytes: totalBytes, trace };
 }
 
 // Shared with the Edge download handler so the client and server use one protocol contract.
