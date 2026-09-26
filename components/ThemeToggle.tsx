@@ -8,7 +8,7 @@ type Accent = 'copper' | 'purple' | 'red';
 type Preset = `${Theme}-${Accent}`;
 
 const STORAGE_KEY = 'ishownet-theme';
-const PRESETS: Preset[] = ['dark-copper', 'light-copper', 'dark-purple', 'dark-red'];
+const PRESETS: Preset[] = ['dark-red', 'light-red', 'dark-purple', 'dark-copper'];
 
 function isPreset(value: string | null): value is Preset {
   return value !== null && PRESETS.includes(value as Preset);
@@ -16,8 +16,9 @@ function isPreset(value: string | null): value is Preset {
 
 function migrateStoredTheme(value: string | null): Preset | null {
   if (isPreset(value)) return value;
-  if (value === 'light') return 'light-copper';
-  if (value === 'dark') return 'dark-copper';
+  if (value === 'light') return 'light-red';
+  if (value === 'dark') return 'dark-red';
+  if (value === 'light-copper') return 'light-red';
   return null;
 }
 
@@ -27,7 +28,7 @@ export default function ThemeToggle() {
   useEffect(() => {
     const stored = migrateStoredTheme(window.localStorage.getItem(STORAGE_KEY));
     const preferredTheme: Theme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-    const preferred: Preset = stored ?? `${preferredTheme}-copper`;
+    const preferred: Preset = stored ?? `${preferredTheme}-red`;
     setPreset(preferred);
     const [theme, accent] = preferred.split('-') as [Theme, Accent];
     document.documentElement.setAttribute('data-theme', theme);
@@ -46,7 +47,7 @@ export default function ThemeToggle() {
     window.localStorage.setItem(STORAGE_KEY, next);
   }
 
-  const nextPreset = preset ? PRESETS[(PRESETS.indexOf(preset) + 1) % PRESETS.length] : 'dark-copper';
+  const nextPreset = preset ? PRESETS[(PRESETS.indexOf(preset) + 1) % PRESETS.length] : 'dark-red';
   const nextLabel = nextPreset.replace('-', ' + ');
 
   return (

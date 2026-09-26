@@ -48,6 +48,14 @@
   color-scheme: light;
 }
 
+[data-theme='light'][data-accent='red'] {
+  --brand-rgb: 217, 31, 53;
+  --brand: #d91f35;
+  --brand-deep: #a81729;
+  --brand-wash: rgba(var(--brand-rgb), 0.13);
+  --brand-contrast: #ffffff;
+}
+
 [data-accent='purple'] {
   --brand-rgb: 124, 58, 237;
   --brand: #7c3aed;
@@ -533,6 +541,19 @@ p {
 .hero > *:not(.hero-glow) {
   position: relative;
   z-index: 1;
+}
+
+[data-theme='light'] .hero-glow {
+  background:
+    radial-gradient(ellipse at 82% 34%, rgba(63, 130, 224, 0.12), transparent 48%),
+    linear-gradient(180deg, rgba(247, 246, 242, 0) 0%, rgba(247, 246, 242, 0.03) 52%, rgba(247, 246, 242, 0.08) 100%);
+}
+
+[data-theme='light'] .hero-glow.done {
+  background:
+    radial-gradient(ellipse at 50% 8%, rgba(var(--brand-rgb), 0.12), transparent 40%),
+    radial-gradient(ellipse at 82% 34%, rgba(63, 130, 224, 0.14), transparent 50%),
+    linear-gradient(180deg, rgba(247, 246, 242, 0) 0%, rgba(247, 246, 242, 0.03) 52%, rgba(247, 246, 242, 0.1) 100%);
 }
 
 .hero-glow.on {

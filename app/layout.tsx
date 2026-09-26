@@ -40,7 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('ishownet-theme');if(t==='light'||t==='dark')t=t+'-copper';if(t!=='dark-copper'&&t!=='light-copper'&&t!=='dark-purple'&&t!=='dark-red')t=(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark')+'-copper';var p=t.split('-');document.documentElement.setAttribute('data-theme',p[0]);document.documentElement.setAttribute('data-accent',p[1]);localStorage.setItem('ishownet-theme',t);}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('ishownet-theme');if(t==='light')t='light-red';if(t==='dark')t='dark-red';if(t==='light-copper')t='light-red';if(t!=='dark-red'&&t!=='light-red'&&t!=='dark-purple'&&t!=='dark-copper')t=(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark')+'-red';var p=t.split('-');document.documentElement.setAttribute('data-theme',p[0]);document.documentElement.setAttribute('data-accent',p[1]);localStorage.setItem('ishownet-theme',t);}catch(e){}})();`,
           }}
         />
       </head>
