@@ -1,2 +1,2 @@
 export const runtime = 'edge';
-export { metaHandler as GET } from '@/lib/edgeHandlers';
+export { handleMeta as GET } from '@/lib/edgeHandlers';
