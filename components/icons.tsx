@@ -13,14 +13,6 @@ const base = {
   strokeLinejoin: 'round' as const,
 };
 
-export function PulseIcon(props: IconProps) {
-  return (
-    <svg {...base} {...props}>
-      <path d="M2 12h4l2.5-7 4 14 2.5-7H22" />
-    </svg>
-  );
-}
-
 export function DownloadIcon(props: IconProps) {
   return (
     <svg {...base} {...props}>
@@ -101,28 +93,6 @@ export function WifiIcon(props: IconProps) {
   );
 }
 
-export function EthernetIcon(props: IconProps) {
-  return (
-    <svg {...base} {...props}>
-      <rect x="7" y="3" width="10" height="8" rx="1" />
-      <path d="M9 11v3M15 11v3" />
-      <rect x="6" y="14" width="12" height="7" rx="1" />
-      <path d="M9 21v-2M12 21v-2M15 21v-2" />
-    </svg>
-  );
-}
-
-export function CellularIcon(props: IconProps) {
-  return (
-    <svg {...base} {...props}>
-      <path d="M4 20V16" />
-      <path d="M9.5 20v-8" />
-      <path d="M15 20V8" />
-      <path d="M20.5 20V4" />
-    </svg>
-  );
-}
-
 export function HistoryIcon(props: IconProps) {
   return (
     <svg {...base} {...props}>
@@ -173,15 +143,6 @@ export function PlayIcon(props: IconProps) {
   return (
     <svg {...base} {...props}>
       <path d="M6 4.5v15l14-7.5-14-7.5Z" />
-    </svg>
-  );
-}
-
-export function SwapIcon(props: IconProps) {
-  return (
-    <svg {...base} {...props}>
-      <path d="M4 8h13l-3-3" />
-      <path d="M20 16H7l3 3" />
     </svg>
   );
 }
