@@ -26,25 +26,6 @@ export const metadata: Metadata = {
   description:
     'Test your internet connection for download speed, upload speed, ping, jitter, packet loss and bufferbloat. Free browser-based speed test.',
   applicationName: 'iShowNet',
-  keywords: [
-    'internet speed test',
-    'speed test',
-    'free internet speed test',
-    'online internet speed test',
-    'internet speed checker',
-    'download speed test',
-    'upload speed test',
-    'ping test',
-    'latency test',
-    'jitter test',
-    'packet loss test',
-    'bufferbloat test',
-    'WiFi speed test',
-    'network speed test',
-  ],
-  authors: [{ name: 'iShowNet' }],
-  creator: 'iShowNet',
-  publisher: 'iShowNet',
   alternates: {
     canonical: siteUrl,
   },
@@ -83,7 +64,6 @@ export const metadata: Metadata = {
       'Test download, upload, ping, jitter, packet loss and bufferbloat in your browser with iShowNet.',
     images: ['/twitter-image'],
   },
-  category: 'technology',
 };
 
 
