@@ -1,0 +1,35 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" x1="2" y1="26" x2="27" y2="7" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e3b34d" />
+      <stop offset="1" stop-color="#e8432c" />
+    </linearGradient>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="1.15" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect x="1.4" y="1.4" width="29.2" height="29.2" rx="9" fill="#131317" stroke="#26262f" stroke-width="1.2" />
+
+  <!-- Static snapshot of the animated mark: the pulse fully arrived at the dot,
+       with a few calm rings frozen mid-signal rather than a mid-motion blur —
+       one shape, one gradient, no second color family. -->
+  <circle cx="23.5" cy="16" r="3.4" fill="none" stroke="url(#g)" stroke-width="0.9" opacity="0.35" />
+  <circle cx="23.5" cy="16" r="5.2" fill="none" stroke="url(#g)" stroke-width="0.8" opacity="0.2" />
+
+  <path
+    d="M4 16 L7 16 L9 8 L11 24 L13 12 L15 20 L17 14 L19 16 L23.5 16"
+    fill="none"
+    stroke="url(#g)"
+    stroke-width="2.1"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    filter="url(#glow)"
+  />
+
+  <circle cx="23.5" cy="16" r="1.9" fill="url(#g)" filter="url(#glow)" />
+</svg>
