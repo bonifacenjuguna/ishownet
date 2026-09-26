@@ -67,12 +67,21 @@ export const metadata: Metadata = {
     siteName: 'iShowNet',
     type: 'website',
     locale: 'en_US',
+    images: [
+      {
+        url: '/opengraph-image',
+        width: 1200,
+        height: 630,
+        alt: 'iShowNet internet speed test',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Internet Speed Test — Download, Upload & Ping | iShowNet',
     description:
       'Test download, upload, ping, jitter, packet loss and bufferbloat in your browser with iShowNet.',
+    images: ['/twitter-image'],
   },
   category: 'technology',
 };

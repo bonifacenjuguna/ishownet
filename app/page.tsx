@@ -473,6 +473,62 @@ export default function Home() {
           )}
         </section>
 
+
+        {/* ───────── Search-friendly guide ───────── */}
+        <section id="how-it-works" className="container section seo-content">
+          <div className="section-head">
+            <p className="eyebrow">About the test</p>
+            <h2>Internet speed and connection quality, measured in one place</h2>
+            <p className="section-sub">
+              iShowNet is a free browser-based internet speed test. It measures more than raw download speed so you can see how responsive your connection stays during everyday use.
+            </p>
+          </div>
+
+          <div className="grid grid-2">
+            <article className="card seo-card">
+              <h3>What does an internet speed test measure?</h3>
+              <p>
+                A speed test measures how quickly data can move between your device and the test service. iShowNet checks download speed, upload speed and response time, then adds connection-quality signals such as jitter, packet loss estimate and latency while the connection is under load.
+              </p>
+            </article>
+            <article className="card seo-card">
+              <h3>Download speed vs. upload speed</h3>
+              <p>
+                Download speed describes how quickly data reaches your device, while upload speed describes how quickly your device sends data. Downloads matter for browsing, streaming and game updates; uploads matter for video calls, live streaming, cloud backups and sending large files.
+              </p>
+            </article>
+            <article className="card seo-card">
+              <h3>What are ping, latency and jitter?</h3>
+              <p>
+                Ping is a round-trip response-time measurement, usually shown in milliseconds. Latency describes delay in a connection, while jitter describes how much that delay varies between measurements. Lower and steadier response times are generally useful for interactive activities such as gaming and video calls.
+              </p>
+            </article>
+            <article className="card seo-card">
+              <h3>What is bufferbloat?</h3>
+              <p>
+                Bufferbloat is excessive latency that appears when a connection is busy moving data. iShowNet compares response time while the line is under download and upload load with its idle response time, helping show whether a fast connection also stays responsive when busy.
+              </p>
+            </article>
+          </div>
+
+          <div className="seo-prose">
+            <h3>How to get a more reliable speed test result</h3>
+            <p>
+              For a useful result, pause large downloads and uploads, stop unnecessary streaming, and test from the location where you normally use the connection. If possible, compare Wi-Fi with Ethernet because wireless signal quality, distance from the router and local interference can affect results. Running more than one test at different times can also reveal congestion or changes in network conditions.
+            </p>
+
+            <h3>Is your internet fast enough for gaming, streaming and calls?</h3>
+            <p>
+              Raw Mbps is only part of connection quality. Online gaming and video calls can be sensitive to ping, jitter and packet loss, while streaming and large downloads depend heavily on sustained download throughput. Cloud gaming and live streaming can be affected by both throughput and latency under load. Use the activity guidance above to interpret your measured connection instead of relying on download speed alone.
+            </p>
+
+            <h3>Wi-Fi, mobile data, fiber and broadband tests</h3>
+            <p>
+              iShowNet runs in the browser, so you can use it on Wi-Fi, Ethernet, mobile data, fiber and other broadband connections without installing a separate speed-test application. Results represent the connection path between your device, network and the iShowNet test service at the time of the test.
+            </p>
+          </div>
+        </section>
+
         {/* ───────── History ───────── */}
         <section id="history" className="container section">
           <div className="section-head row">
