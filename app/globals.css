@@ -49,9 +49,9 @@
 }
 
 [data-accent='purple'] {
-  --brand-rgb: 139, 92, 246;
-  --brand: #8b5cf6;
-  --brand-deep: #6d28d9;
+  --brand-rgb: 124, 58, 237;
+  --brand: #7c3aed;
+  --brand-deep: #5b21b6;
   --brand-wash: rgba(var(--brand-rgb), 0.14);
   --brand-contrast: #ffffff;
 }
