@@ -208,6 +208,9 @@ export default function Home() {
         ping: result!.pingMs,
         jitter: result!.jitterMs,
         loss: result!.packetLossPct,
+        downloadLatency: result!.downloadLatencyMs,
+        uploadLatency: result!.uploadLatencyMs,
+        bufferbloat: result!.bufferbloatMs,
       })
     : null;
   const greatCount = activities ? activities.filter((a) => a.level === 'great').length : 0;
