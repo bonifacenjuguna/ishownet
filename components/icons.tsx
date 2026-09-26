@@ -196,6 +196,15 @@ export function TrashIcon(props: IconProps) {
   );
 }
 
+export function MessageIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M5 5.5h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-8l-5 3v-3.1a2 2 0 0 1-1-1.9v-7a2 2 0 0 1 2-2Z" />
+      <path d="M8 10h8M8 13h5" />
+    </svg>
+  );
+}
+
 export function VideoIcon(props: IconProps) {
   return (
     <svg {...base} {...props}>
