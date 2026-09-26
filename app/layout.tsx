@@ -16,26 +16,69 @@ const plexMono = IBM_Plex_Mono({
 });
 
 const siteUrl = 'https://ishownet.vercel.app';
+const siteTitle = 'Internet Speed Test — Download, Upload & Ping | iShowNet';
+const siteDescription =
+  'Test your internet connection for download speed, upload speed, ping, jitter, packet loss and bufferbloat. Free browser-based speed test.';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://ishownet.vercel.app'),
-  title: 'Internet Speed Test — Download, Upload & Ping | iShowNet',
-  description:
-    'Test your internet connection for download speed, upload speed, ping, jitter, packet loss and bufferbloat. Free browser-based speed test.',
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: siteTitle,
+    template: '%s | iShowNet',
+  },
+  description: siteDescription,
   applicationName: 'iShowNet',
+  keywords: [
+    'internet speed test',
+    'speed test',
+    'free internet speed test',
+    'online internet speed test',
+    'internet speed checker',
+    'network speed test',
+    'WiFi speed test',
+    'ping test',
+    'latency test',
+    'jitter test',
+    'packet loss test',
+    'bufferbloat test',
+    'download speed test',
+    'upload speed test',
+  ],
+  alternates: {
+    canonical: '/',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-video-preview': -1,
+      'max-snippet': -1,
+    },
+  },
   openGraph: {
-    title: 'Internet Speed Test — Download, Upload & Ping | iShowNet',
-    description:
-      'Test download, upload, ping, jitter, packet loss and bufferbloat in your browser with iShowNet.',
-    url: 'https://ishownet.vercel.app',
+    title: siteTitle,
+    description: siteDescription,
+    url: siteUrl,
     siteName: 'iShowNet',
+    locale: 'en_US',
     type: 'website',
+    images: [
+      {
+        url: '/opengraph-image',
+        width: 1200,
+        height: 630,
+        alt: 'iShowNet — Internet Speed Test',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Internet Speed Test — Download, Upload & Ping | iShowNet',
-    description:
-      'Test download, upload, ping, jitter, packet loss and bufferbloat in your browser with iShowNet.',
+    title: siteTitle,
+    description: siteDescription,
+    images: ['/twitter-image'],
   },
 };
 
@@ -43,7 +86,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="canonical" href="https://ishownet.vercel.app" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -51,13 +93,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               '@context': 'https://schema.org',
               '@type': 'WebApplication',
               name: 'iShowNet',
-              url: 'https://ishownet.vercel.app',
+              url: siteUrl,
               description:
                 'A browser-based internet speed and connection quality test for download, upload, ping, jitter, packet loss and bufferbloat.',
               applicationCategory: 'UtilitiesApplication',
               operatingSystem: 'Web Browser',
               browserRequirements: 'Requires JavaScript and a modern web browser.',
               isAccessibleForFree: true,
+              featureList: [
+                'Internet speed test',
+                'Download speed measurement',
+                'Upload speed measurement',
+                'Ping and latency measurement',
+                'Jitter measurement',
+                'Packet loss estimate',
+                'Bufferbloat measurement',
+                'Connection quality analysis',
+              ],
             }),
           }}
         />
