@@ -2,6 +2,8 @@
 // Shared by the API route wrappers. Keeping the handlers here makes the measurement
 // endpoints tiny and keeps their behavior consistent across the app.
 
+import { DOWNLOAD_CHUNK_BYTES, DOWNLOAD_SIZE_BYTES } from './constants';
+
 export const runtime = 'edge';
 
 export async function handlePing() {
@@ -15,19 +17,18 @@ export async function handlePing() {
 }
 
 export async function handleDownload() {
-  const size = 2 * 1024 * 1024;
-  const chunk = new Uint8Array(64 * 1024);
+  const chunk = new Uint8Array(DOWNLOAD_CHUNK_BYTES);
   crypto.getRandomValues(chunk);
   const stream = new ReadableStream({
     pull(controller) {
-      for (let i = 0; i < 16; i++) controller.enqueue(chunk);
+      for (let i = 0; i < DOWNLOAD_SIZE_BYTES / DOWNLOAD_CHUNK_BYTES; i++) controller.enqueue(chunk);
       controller.close();
     },
   });
   return new Response(stream, {
     headers: {
       'Content-Type': 'application/octet-stream',
-      'Content-Length': size.toString(),
+      'Content-Length': DOWNLOAD_SIZE_BYTES.toString(),
       'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
     },
   });
@@ -52,6 +53,6 @@ export async function handleMeta(request: Request) {
     region: h.get('x-vercel-ip-country-region') || null,
     latitude: h.get('x-vercel-ip-latitude') || null,
     longitude: h.get('x-vercel-ip-longitude') || null,
-    isp: h.get('x-vercel-ip-asn') || null,
+    asn: h.get('x-vercel-ip-asn') || null,
   }, { headers: { 'Cache-Control': 'no-store' } });
 }
