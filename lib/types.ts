@@ -19,6 +19,8 @@ export interface TestResult {
   uploadMbps: number;
   idlePingMs: number;
   loadedPingMs: number;
+  downloadLatencyMs: number;
+  uploadLatencyMs: number;
   bufferbloatMs: number;
   bufferbloatGrade: BufferbloatGrade;
   downloadTrace: TracePoint[];
