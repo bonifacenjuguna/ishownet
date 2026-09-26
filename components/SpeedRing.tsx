@@ -30,9 +30,11 @@ const CIRC_IN = 2 * Math.PI * R_IN;
  * The curve is intentionally slightly steeper than linear so very fast
  * connections do not pin the dial near the end too early.
  */
-function fraction(mbps: number, unit: SpeedUnit): number {
+function fraction(mbps: number, unit: SpeedUnit, direction: 'download' | 'upload'): number {
   const displaySpeed = unit === 'MB/s' ? mbps / 8 : mbps;
-  const fullScale = unit === 'MB/s' ? 125 : 1000;
+  const fullScale = direction === 'download'
+    ? unit === 'MB/s' ? 125 : 1000
+    : unit === 'MB/s' ? 12.5 : 100;
   const normalized = Math.max(0, displaySpeed) / fullScale;
   return Math.max(0, Math.min(1, normalized ** 1.1));
 }
@@ -92,7 +94,7 @@ export default function SpeedRing({ down, up, centerMbps, unit, label, scanning,
           strokeWidth={WIDTH_OUT}
           strokeLinecap="round"
           strokeDasharray={CIRC_OUT}
-          strokeDashoffset={CIRC_OUT * (1 - fraction(down, unit))}
+          strokeDashoffset={CIRC_OUT * (1 - fraction(down, unit, 'download'))}
           transform={`rotate(-90 ${C} ${C})`}
           filter="url(#ringGlow)"
           className="ring-arc"
@@ -107,7 +109,7 @@ export default function SpeedRing({ down, up, centerMbps, unit, label, scanning,
           strokeWidth={WIDTH_IN}
           strokeLinecap="round"
           strokeDasharray={CIRC_IN}
-          strokeDashoffset={CIRC_IN * (1 - fraction(up, unit))}
+          strokeDashoffset={CIRC_IN * (1 - fraction(up, unit, 'upload'))}
           transform={`rotate(-90 ${C} ${C})`}
           filter="url(#ringGlow)"
           className="ring-arc"
