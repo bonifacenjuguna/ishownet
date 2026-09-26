@@ -1,2 +1,2 @@
 export const runtime = 'edge';
-export { pingHandler as GET } from '@/lib/edgeHandlers';
+export { handlePing as GET } from '@/lib/edgeHandlers';
