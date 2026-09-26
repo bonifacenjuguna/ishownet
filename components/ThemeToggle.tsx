@@ -14,19 +14,16 @@ function isPreset(value: string | null): value is Preset {
   return value !== null && PRESETS.includes(value as Preset);
 }
 
-function migrateStoredTheme(value: string | null): Preset | null {
-  if (isPreset(value)) return value;
-  if (value === 'light') return 'light-red';
-  if (value === 'dark') return 'dark-red';
-  if (value === 'light-copper') return 'light-red';
-  return null;
+function readStoredTheme(): Preset | null {
+  const value = window.localStorage.getItem(STORAGE_KEY);
+  return isPreset(value) ? value : null;
 }
 
 export default function ThemeToggle() {
   const [preset, setPreset] = useState<Preset | null>(null);
 
   useEffect(() => {
-    const stored = migrateStoredTheme(window.localStorage.getItem(STORAGE_KEY));
+    const stored = readStoredTheme();
     const preferredTheme: Theme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
     const preferred: Preset = stored ?? `${preferredTheme}-red`;
     setPreset(preferred);
