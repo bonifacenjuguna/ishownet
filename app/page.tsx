@@ -65,7 +65,6 @@ function loadedLatencyLevel(ms: number): Level {
 export default function Home() {
   const [phase, setPhase] = useState<TestPhase>('idle');
   const [unit, setUnit] = useState<SpeedUnit>('Mbps');
-  const [runId, setRunId] = useState(0);
   const [focus, setFocus] = useState<Focus>('download');
 
   // One presentation signal per direction. The engine supplies real targets;
@@ -119,12 +118,9 @@ export default function Home() {
   async function handleRun() {
     if (runningRef.current) return;
     runningRef.current = true;
-    setRunId((n) => n + 1);
     setResult(null);
     setError(null);
     setFocus('download');
-    downMetric.reset(0);
-    upMetric.reset(0);
     setPing(null);
     setDownSeries([]);
     setUpSeries([]);
@@ -132,8 +128,6 @@ export default function Home() {
     setUpLocked(false);
     setPrimed({ download: false, upload: false });
     setPhase('ping');
-    downMetric.reset(0);
-    upMetric.reset(0);
 
     try {
       const finalResult = await runFullTest({
@@ -195,14 +189,10 @@ export default function Home() {
 
   const centerKind: Focus = phase === 'upload' ? 'upload' : isDone ? focus : 'download';
   const centerMbps = centerKind === 'upload' ? up : down;
-  // The number eases toward its target, but snaps straight to the current
-  // value (no counting-up-from-zero) on a brand-new run, whenever the ring
-  // switches which metric it's showing, and the instant a stage produces its
-  // first real sample — so it never reveals a stale "0" target that was only
-  // there because that stage hadn't started sampling yet.
-  const snapKey = `${runId}:${centerKind}:${centerKind === 'upload' ? primed.upload : primed.download}`;
+  // The displayed value is already the shared synchronized metric. There is
+  // no second animation layer or frontend-generated number sequence.
 
-  // True while a stage is actively running but hasn't produced its first
+    // True while a stage is actively running but hasn't produced its first
   // sample yet, so the ring can show a "still working" state instead of a
   // literal 0.0 that reads as finished or reset.
   const priming = phase === 'ping' || (phase === 'download' && !primed.download) || (phase === 'upload' && !primed.upload);
@@ -280,7 +270,6 @@ export default function Home() {
             down={down}
             up={up}
             centerMbps={centerMbps}
-            snapKey={snapKey}
             unit={unit}
             label={ringLabel}
             scanning={priming}
