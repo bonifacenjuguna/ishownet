@@ -8,13 +8,8 @@ export function loadHistory(): TestResult[] {
   try {
     const raw = window.localStorage.getItem(KEY);
     if (!raw) return [];
-    const parsed = JSON.parse(raw) as Array<TestResult & { isp?: string | null }>;
-    if (!Array.isArray(parsed)) return [];
-    // Migrate results saved before the ISP field was corrected to ASN.
-    return parsed.map(({ isp, ...item }) => ({
-      ...item,
-      asn: item.asn ?? isp ?? null,
-    }));
+    const parsed = JSON.parse(raw) as TestResult[];
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
   }
@@ -26,7 +21,7 @@ export function saveResult(result: TestResult): TestResult[] {
   try {
     window.localStorage.setItem(KEY, JSON.stringify(next));
   } catch {
-    // Storage full or unavailable; keep in-memory only for this session.
+    // Storage unavailable; keep the current result in memory.
   }
   return next;
 }
@@ -35,6 +30,6 @@ export function clearHistory(): void {
   try {
     window.localStorage.removeItem(KEY);
   } catch {
-    // ignore
+    // Ignore storage failures.
   }
 }
