@@ -57,6 +57,9 @@ function jitterLevel(ms: number): Level {
 function lossLevel(pct: number): Level {
   return pct === 0 ? 'great' : pct < 2 ? 'ok' : 'poor';
 }
+function loadedLatencyLevel(ms: number): Level {
+  return ms < 50 ? 'great' : ms < 100 ? 'ok' : 'poor';
+}
 
 export default function Home() {
   const [phase, setPhase] = useState<TestPhase>('idle');
@@ -356,12 +359,13 @@ export default function Home() {
 
           <div className="grid grid-4">
             <StatCard
-              icon={<PulseIcon width={20} height={20} />}
-              label="Ping"
-              value={ping ? formatMs(ping.ms) : null}
-              unit="ms"
-              level={ping ? pingLevel(ping.ms) : undefined}
-              hint="Round-trip time to the test server. Lower is more responsive for calls and games."
+              icon={<BufferIcon width={20} height={20} />}
+              label="Bufferbloat"
+              value={isDone ? result!.bufferbloatGrade : null}
+              unit={isDone ? `+${formatMs(result!.bufferbloatMs)} ms` : undefined}
+              level={isDone ? gradeLevel(result!.bufferbloatGrade) : undefined}
+              badge={isDone ? `Grade ${result!.bufferbloatGrade}` : undefined}
+              hint="Extra delay when your line is busy. Grade A means it stays responsive under load."
             />
             <StatCard
               icon={<PacketLossIcon width={20} height={20} />}
@@ -374,19 +378,18 @@ export default function Home() {
             <StatCard
               icon={<JitterIcon width={20} height={20} />}
               label="Jitter"
-              value={ping ? formatMs(ping.jitter, 1) : null}
+              value={isDone ? formatMs(result!.jitterMs, 1) : null}
               unit="ms"
-              level={ping ? jitterLevel(ping.jitter) : undefined}
+              level={isDone ? jitterLevel(result!.jitterMs) : undefined}
               hint="How much your ping wobbles. Steady is best for calls and games."
             />
             <StatCard
-              icon={<BufferIcon width={20} height={20} />}
-              label="Bufferbloat"
-              value={isDone ? result!.bufferbloatGrade : null}
-              unit={isDone ? `+${formatMs(result!.bufferbloatMs)} ms` : undefined}
-              level={isDone ? gradeLevel(result!.bufferbloatGrade) : undefined}
-              badge={isDone ? `Grade ${result!.bufferbloatGrade}` : undefined}
-              hint="Extra delay when your line is busy. Grade A means it stays responsive under load."
+              icon={<DownloadIcon width={20} height={20} />}
+              label="Download latency"
+              value={isDone ? formatMs(result!.downloadLatencyMs) : null}
+              unit="ms"
+              level={isDone ? loadedLatencyLevel(result!.downloadLatencyMs) : undefined}
+              hint="Response time while your connection is busy downloading data."
             />
           </div>
 
