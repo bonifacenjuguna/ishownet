@@ -18,36 +18,18 @@ const plexMono = IBM_Plex_Mono({
 const siteUrl = 'https://ishownet.vercel.app';
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: {
-    default: 'Internet Speed Test — Download, Upload & Ping | iShowNet',
-    template: '%s | iShowNet',
-  },
+  metadataBase: new URL('https://ishownet.vercel.app'),
+  title: 'Internet Speed Test — Download, Upload & Ping | iShowNet',
   description:
     'Test your internet connection for download speed, upload speed, ping, jitter, packet loss and bufferbloat. Free browser-based speed test.',
   applicationName: 'iShowNet',
-  alternates: {
-    canonical: siteUrl,
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-      'max-video-preview': -1,
-    },
-  },
   openGraph: {
     title: 'Internet Speed Test — Download, Upload & Ping | iShowNet',
     description:
       'Test download, upload, ping, jitter, packet loss and bufferbloat in your browser with iShowNet.',
-    url: siteUrl,
+    url: 'https://ishownet.vercel.app',
     siteName: 'iShowNet',
     type: 'website',
-    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
