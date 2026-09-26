@@ -1,2 +1,2 @@
 export const runtime = 'edge';
-export { downloadHandler as GET } from '@/lib/edgeHandlers';
+export { handleDownload as GET } from '@/lib/edgeHandlers';
