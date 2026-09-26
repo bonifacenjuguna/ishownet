@@ -1,8 +1,8 @@
 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="g" x1="2" y1="26" x2="27" y2="7" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#e3b34d" />
-      <stop offset="1" stop-color="#e8432c" />
+      <stop offset="0" stop-color="#ef233c" />
+      <stop offset="1" stop-color="#b91c2e" />
     </linearGradient>
     <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
       <feGaussianBlur stdDeviation="1.15" result="blur" />
