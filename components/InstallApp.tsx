@@ -52,8 +52,18 @@ export default function InstallApp() {
 
   async function handleInstall() {
     if (!promptEvent) return;
-    await promptEvent.prompt();
+
+    const currentPrompt = promptEvent;
     setPromptEvent(null);
+
+    await currentPrompt.prompt();
+    const { outcome } = await currentPrompt.userChoice;
+
+    if (outcome === 'dismissed') {
+      // The current browser prompt is consumed. A future beforeinstallprompt
+      // event can make the install UI available again.
+      setPromptEvent(null);
+    }
   }
 
   if (installed || (!promptEvent && !ios)) return null;
@@ -79,7 +89,7 @@ export default function InstallApp() {
 
         {promptEvent ? (
           <button className="btn btn-primary install-button" onClick={handleInstall}>
-            Install app
+            Install iShowNet
           </button>
         ) : (
           <div className="install-ios">
