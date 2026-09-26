@@ -1,10 +1,5 @@
 export type TestPhase = 'idle' | 'ping' | 'download' | 'upload' | 'done' | 'error';
 
-export interface TracePoint {
-  t: number;
-  mbps: number;
-}
-
 export type BufferbloatGrade = 'A' | 'B' | 'C' | 'D' | 'F';
 
 export interface TestResult {

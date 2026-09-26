@@ -153,7 +153,7 @@ async function measureAdaptive(
   let totalBytes = 0;
   let windowBytes = 0;
   let windowStart = start;
-  const trace: TracePoint[] = [];
+  const trace: TraceSample[] = [];
   let stop = false;
   const shouldStop = () => stop;
   const addBytes = (n: number) => {
