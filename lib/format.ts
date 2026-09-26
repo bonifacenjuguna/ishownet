@@ -92,10 +92,10 @@ export function buildActivities(r: ActivityMetrics): Activity[] {
     {
       id: 'social',
       name: 'Social & messaging',
-      need: 'Chats, posts, reels, stories & DMs',
+      need: 'Emails, chats, posts, reels, stories & DMs',
       level: pick(
-        down >= 8 && up >= 3 && ping < 120 && jitter < 30 && loss < 1,
-        down >= 2 && up >= 0.8 && ping < 250 && jitter < 60 && loss < 5
+        down >= 2 && up >= 0.5 && loss < 1,
+        down >= 0.5 && up >= 0.1 && loss < 5
       ),
     },
     {
@@ -104,7 +104,7 @@ export function buildActivities(r: ActivityMetrics): Activity[] {
       need: 'Zoom, Meet, Teams in HD',
       level: pick(
         down >= 8 && up >= 4 && ping < 80 && jitter < 20 && loss < 1 && loadedLatency < 120,
-        down >= 3 && up >= 1.5 && ping < 150 && jitter < 35 && loss < 3 && loadedLatency < 200
+        down >= 3 && up >= 1.5 && ping < 180 && jitter < 45 && loss < 3 && loadedLatency < 220
       ),
     },
     {
@@ -112,7 +112,7 @@ export function buildActivities(r: ActivityMetrics): Activity[] {
       name: 'HD streaming',
       need: '1080p on Netflix, YouTube',
       level: pick(
-        down >= 10 && loss < 2 && bufferbloat < 100,
+        down >= 10 && loss < 2 && bufferbloat < 120,
         down >= 5 && loss < 5
       ),
     },
@@ -121,7 +121,7 @@ export function buildActivities(r: ActivityMetrics): Activity[] {
       name: '4K streaming',
       need: 'Ultra HD, about 15 Mbps',
       level: pick(
-        down >= 25 && loss < 2 && bufferbloat < 100,
+        down >= 25 && loss < 2 && bufferbloat < 120,
         down >= 15 && loss < 5
       ),
     },
@@ -131,7 +131,7 @@ export function buildActivities(r: ActivityMetrics): Activity[] {
       need: 'Low ping and steady jitter',
       level: pick(
         down >= 5 && up >= 2 && ping < 50 && jitter < 15 && loss < 1 && loadedLatency < 100,
-        down >= 3 && up >= 1 && ping < 100 && jitter < 30 && loss < 3 && loadedLatency < 180
+        down >= 3 && up >= 1 && ping < 100 && jitter < 35 && loss < 3 && loadedLatency < 180
       ),
     },
     {
@@ -149,7 +149,7 @@ export function buildActivities(r: ActivityMetrics): Activity[] {
       need: 'Going live in 1080p',
       level: pick(
         up >= 10 && upLatency < 120 && loss < 1 && jitter < 20,
-        up >= 5 && upLatency < 200 && loss < 3 && jitter < 40
+        up >= 5 && upLatency < 220 && loss < 3 && jitter < 40
       ),
     },
   ];
