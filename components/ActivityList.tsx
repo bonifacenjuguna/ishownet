@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react';
-import { BroadcastIcon, CloudIcon, GamepadIcon, TvIcon, VideoIcon } from './icons';
+import { BroadcastIcon, CloudIcon, GamepadIcon, MessageIcon, TvIcon, VideoIcon } from './icons';
 import { levelColor, type Activity } from '@/lib/format';
 
 const ICONS: Record<string, ReactNode> = {
+  social: <MessageIcon width={20} height={20} />,
   calls: <VideoIcon width={20} height={20} />,
   hd: <TvIcon width={20} height={20} />,
   '4k': <TvIcon width={20} height={20} />,
@@ -17,6 +18,7 @@ export default function ActivityList({ activities }: { activities: Activity[] | 
   const items: Activity[] =
     activities ??
     [
+      { id: 'social', name: 'Social & messaging', need: 'Chats, posts, reels, stories & DMs' },
       { id: 'calls', name: 'Video calls', need: 'Zoom, Meet, Teams in HD' },
       { id: 'hd', name: 'HD streaming', need: '1080p on Netflix, YouTube' },
       { id: '4k', name: '4K streaming', need: 'Ultra HD, about 25 Mbps' },
