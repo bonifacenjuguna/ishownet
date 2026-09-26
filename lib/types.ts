@@ -30,7 +30,7 @@ export interface TestResult {
   downloadDurationMs?: number;
   uploadDurationMs?: number;
   ip: string | null;
-  isp: string | null;
+  asn: string | null;
   city: string | null;
   country: string | null;
   networkType: string;
