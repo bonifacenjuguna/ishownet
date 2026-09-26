@@ -395,6 +395,14 @@ export default function Home() {
 
           <div className="grid grid-4">
             <StatCard
+              icon={<UploadIcon width={20} height={20} />}
+              label="Upload latency"
+              value={isDone ? formatMs(result!.uploadLatencyMs) : null}
+              unit="ms"
+              level={isDone ? loadedLatencyLevel(result!.uploadLatencyMs) : undefined}
+              hint="Response time while your connection is busy uploading data."
+            />
+            <StatCard
               icon={<LocationIcon width={20} height={20} />}
               label="Location"
               value={locationText || null}
