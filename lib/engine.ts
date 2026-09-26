@@ -1,4 +1,4 @@
-import type { BufferbloatGrade, TestPhase, TestResult, TracePoint } from './types';
+import type { BufferbloatGrade, TestPhase, TestResult } from './types';
 import { DOWNLOAD_SIZE_BYTES } from './constants';
 
 const API = '/api';
@@ -73,10 +73,15 @@ async function measurePing(
   return { avg, jitter, lossPct, lost, attempted };
 }
 
+interface TraceSample {
+  t: number;
+  mbps: number;
+}
+
 interface ThroughputResult {
   mbps: number;
   bytes: number;
-  trace: TracePoint[];
+  trace: TraceSample[];
   /** How many parallel streams the ramp settled on. */
   streamsUsed: number;
   /** Total wall-clock time this measurement actually ran for. */
@@ -88,7 +93,7 @@ interface ThroughputResult {
  *  200ms tick interval — so ordinary timer jitter between ticks can't skew the result
  *  the way a plain average-of-rates would. Falls back to `fallback` (the whole-test
  *  overall average) if there aren't enough steady-state samples to trust. */
-function timeWeightedAverage(trace: TracePoint[], cutoffT: number, fallback: number): number {
+function timeWeightedAverage(trace: TraceSample[], cutoffT: number, fallback: number): number {
   const steady = trace.filter((p) => p.t >= cutoffT && Number.isFinite(p.mbps) && p.mbps >= 0);
   if (steady.length < 4) return fallback;
 
@@ -412,27 +417,18 @@ export async function runFullTest(cb: EngineCallbacks = {}): Promise<TestResult>
   return {
     id: crypto.randomUUID(),
     timestamp: Date.now(),
-    region: 'auto',
     regionLabel: 'Closest edge',
     pingMs: idlePing.avg,
     jitterMs: idlePing.jitter,
     packetLossPct,
     downloadMbps: download.mbps,
     uploadMbps: upload.mbps,
-    idlePingMs: idlePing.avg,
-    loadedPingMs: loadedAvg,
     downloadLatencyMs: loadedDown.avg,
     uploadLatencyMs: loadedUp.avg,
     bufferbloatMs,
     bufferbloatGrade: gradeBufferbloat(bufferbloatMs),
-    downloadTrace: download.trace,
-    uploadTrace: upload.trace,
     bytesDown: download.bytes,
     bytesUp: upload.bytes,
-    downloadStreams: download.streamsUsed,
-    uploadStreams: upload.streamsUsed,
-    downloadDurationMs: download.durationMs,
-    uploadDurationMs: upload.durationMs,
     ip: meta.ip,
     asn: meta.asn,
     city: meta.city,
