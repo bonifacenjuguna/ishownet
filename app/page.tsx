@@ -9,6 +9,7 @@ import StatCard from '@/components/StatCard';
 import ActivityList from '@/components/ActivityList';
 import HistoryGraph from '@/components/HistoryGraph';
 import HistoryList from '@/components/HistoryList';
+import InstallApp from '@/components/InstallApp';
 import ResultCard from '@/components/ResultCard';
 import {
   BoltIcon,
@@ -505,6 +506,8 @@ export default function Home() {
           </div>
         </section>
 
+
+        <InstallApp />
 
         {/* ───────── Search-friendly guide ───────── */}
         <section id="how-it-works" className="container section seo-content">
