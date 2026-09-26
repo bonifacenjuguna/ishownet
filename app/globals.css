@@ -1530,3 +1530,22 @@ p {
   flex-wrap: wrap;
 }
 
+
+/* ───────── SEO / educational content ───────── */
+
+.seo-content .card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.seo-content .card p {
+  color: var(--text-dim);
+  line-height: 1.65;
+  font-size: 0.94rem;
+}
+
+.seo-subhead {
+  margin-top: 56px;
+  margin-bottom: 24px;
+}
