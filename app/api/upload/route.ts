@@ -1,2 +1,2 @@
 export const runtime = 'edge';
-export { uploadHandler as POST } from '@/lib/edgeHandlers';
+export { handleUpload as POST } from '@/lib/edgeHandlers';
