@@ -4,29 +4,54 @@ import { useEffect, useState } from 'react';
 import { MoonIcon, SunIcon } from './icons';
 
 type Theme = 'dark' | 'light';
+type Accent = 'copper' | 'purple';
+type Preset = `${Theme}-${Accent}`;
 
 const STORAGE_KEY = 'ishownet-theme';
+const PRESETS: Preset[] = ['dark-copper', 'dark-purple', 'light-copper', 'light-purple'];
+
+function isPreset(value: string | null): value is Preset {
+  return value !== null && PRESETS.includes(value as Preset);
+}
+
+function migrateStoredTheme(value: string | null): Preset | null {
+  if (isPreset(value)) return value;
+  if (value === 'light') return 'light-copper';
+  if (value === 'dark') return 'dark-copper';
+  return null;
+}
 
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme | null>(null);
+  const [preset, setPreset] = useState<Preset | null>(null);
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(STORAGE_KEY) as Theme | null;
-    const preferred: Theme = stored ?? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-    setTheme(preferred);
-    document.documentElement.setAttribute('data-theme', preferred);
+    const stored = migrateStoredTheme(window.localStorage.getItem(STORAGE_KEY));
+    const preferredTheme: Theme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    const preferred: Preset = stored ?? `${preferredTheme}-copper`;
+    setPreset(preferred);
+    const [theme, accent] = preferred.split('-') as [Theme, Accent];
+    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.setAttribute('data-accent', accent);
+    window.localStorage.setItem(STORAGE_KEY, preferred);
   }, []);
 
   function toggle() {
-    const next: Theme = theme === 'light' ? 'dark' : 'light';
-    setTheme(next);
-    document.documentElement.setAttribute('data-theme', next);
+    if (!preset) return;
+    const currentIndex = PRESETS.indexOf(preset);
+    const next = PRESETS[(currentIndex + 1) % PRESETS.length];
+    setPreset(next);
+    const [theme, accent] = next.split('-') as [Theme, Accent];
+    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.setAttribute('data-accent', accent);
     window.localStorage.setItem(STORAGE_KEY, next);
   }
 
+  const nextPreset = preset ? PRESETS[(PRESETS.indexOf(preset) + 1) % PRESETS.length] : 'dark-copper';
+  const nextLabel = nextPreset.replace('-', ' + ');
+
   return (
     <button type="button" className="theme-toggle" onClick={toggle}
-      aria-label={theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'}>
+      aria-label={`Switch to ${nextLabel} theme`} title={`Next: ${nextLabel}`}>
       <SunIcon className="icon-sun" width={17} height={17} />
       <MoonIcon className="icon-moon" width={17} height={17} />
     </button>
