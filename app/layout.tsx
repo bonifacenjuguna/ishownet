@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Instrument_Sans, IBM_Plex_Mono } from 'next/font/google';
 import './globals.css';
 
@@ -19,6 +19,12 @@ const siteUrl = 'https://ishownet.vercel.app';
 const siteTitle = 'Internet Speed Test — Download, Upload & Ping | iShowNet';
 const siteDescription =
   'Test your internet connection for download speed, upload speed, ping, jitter, packet loss and bufferbloat. Free browser-based speed test.';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -86,6 +92,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <meta id="theme-color" name="theme-color" content="#07070a" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -116,7 +123,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           id="theme-init"
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('ishownet-theme');if(t!=='dark-red'&&t!=='light-red'&&t!=='dark-purple'&&t!=='dark-copper')t=(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark')+'-red';var p=t.split('-');document.documentElement.setAttribute('data-theme',p[0]);document.documentElement.setAttribute('data-accent',p[1]);localStorage.setItem('ishownet-theme',t);}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('ishownet-theme');if(t!=='dark-red'&&t!=='light-red'&&t!=='dark-purple'&&t!=='dark-copper')t=(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark')+'-red';var p=t.split('-');document.documentElement.setAttribute('data-theme',p[0]);document.documentElement.setAttribute('data-accent',p[1]);var c=p[0]==='light'?'#f7f6f2':(p[1]==='purple'?'#7c3aed':p[1]==='copper'?'#e3b34d':'#07070a');var m=document.getElementById('theme-color');if(m)m.setAttribute('content',c);localStorage.setItem('ishownet-theme',t);}catch(e){}})();`,
           }}
         />
       </head>
