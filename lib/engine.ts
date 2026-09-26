@@ -377,6 +377,8 @@ export async function runFullTest(cb: EngineCallbacks = {}): Promise<TestResult>
     uploadMbps: upload.mbps,
     idlePingMs: idlePing.avg,
     loadedPingMs: loadedAvg,
+    downloadLatencyMs: loadedDown.avg,
+    uploadLatencyMs: loadedUp.avg,
     bufferbloatMs,
     bufferbloatGrade: gradeBufferbloat(bufferbloatMs),
     downloadTrace: download.trace,
