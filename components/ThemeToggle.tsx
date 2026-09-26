@@ -4,11 +4,11 @@ import { useEffect, useState } from 'react';
 import { MoonIcon, SunIcon } from './icons';
 
 type Theme = 'dark' | 'light';
-type Accent = 'copper' | 'purple';
+type Accent = 'copper' | 'purple' | 'red';
 type Preset = `${Theme}-${Accent}`;
 
 const STORAGE_KEY = 'ishownet-theme';
-const PRESETS: Preset[] = ['dark-copper', 'dark-purple', 'light-copper', 'light-purple'];
+const PRESETS: Preset[] = ['dark-copper', 'light-copper', 'dark-purple', 'dark-red'];
 
 function isPreset(value: string | null): value is Preset {
   return value !== null && PRESETS.includes(value as Preset);
