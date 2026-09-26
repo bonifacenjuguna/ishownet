@@ -504,6 +504,93 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ───────── SEO / educational content ───────── */}
+        <section id="about" className="container section seo-content">
+          <div className="section-head">
+            <p className="eyebrow">About the test</p>
+            <h2>Internet speed and connection quality, in one test</h2>
+            <p className="section-sub">
+              iShowNet checks more than download speed. It measures the parts of your internet
+              connection that affect browsing, video calls, streaming, gaming and other everyday use.
+            </p>
+          </div>
+
+          <div className="grid grid-2">
+            <article className="card">
+              <h3>What does an internet speed test measure?</h3>
+              <p>
+                An internet speed test measures how quickly data can move between your device and
+                the test service. iShowNet measures download speed, upload speed and response time,
+                then adds jitter, a browser-based packet loss estimate and latency while the
+                connection is under load.
+              </p>
+            </article>
+
+            <article className="card">
+              <h3>Why ping, jitter and latency matter</h3>
+              <p>
+                Download speed is only part of connection quality. Ping is round-trip response
+                time, while jitter describes how much that response time varies. Lower and steadier
+                latency is generally useful for interactive activities such as online gaming and
+                video calls.
+              </p>
+            </article>
+
+            <article className="card">
+              <h3>What is bufferbloat?</h3>
+              <p>
+                Bufferbloat is excessive latency that appears when a connection is busy moving
+                data. iShowNet compares response time at idle with latency during download and
+                upload activity to show how much delay your connection adds under load.
+              </p>
+            </article>
+
+            <article className="card">
+              <h3>How to get a more useful speed test result</h3>
+              <p>
+                For a cleaner measurement, stop large downloads and uploads, close bandwidth-heavy
+                apps, and test from the same device and location when comparing results. Wi-Fi can
+                vary with distance, interference and congestion, so Ethernet can be useful when you
+                want to isolate the local wireless link.
+              </p>
+            </article>
+          </div>
+
+          <div className="section-head seo-subhead">
+            <p className="eyebrow">Common questions</p>
+            <h2>Understanding your result</h2>
+          </div>
+
+          <div className="grid grid-3">
+            <article className="card">
+              <h3>Is a higher Mbps number always better?</h3>
+              <p>
+                More bandwidth can help when several devices transfer data at once or when you
+                stream high-resolution video. For interactive use, latency, jitter and connection
+                stability also matter.
+              </p>
+            </article>
+
+            <article className="card">
+              <h3>Is Wi-Fi slower than Ethernet?</h3>
+              <p>
+                It can be, but there is no fixed rule. Wi-Fi performance depends on signal strength,
+                interference, the access point, wireless standard and network congestion. Comparing
+                Wi-Fi and Ethernet on the same connection can help identify the local bottleneck.
+              </p>
+            </article>
+
+            <article className="card">
+              <h3>Does iShowNet store my test history?</h3>
+              <p>
+                Your saved test history is kept in your browser. The test uses same-origin
+                endpoints to perform measurements, and the result page can show network metadata
+                such as IP, ASN and the detected edge location.
+              </p>
+            </article>
+          </div>
+        </section>
+
       </main>
 
       <Footer />
