@@ -211,7 +211,7 @@ export default function Home() {
 
   const locationText = [result?.city ?? meta?.city, result?.country ?? meta?.country].filter(Boolean).join(', ');
   const ipText = result?.ip ?? meta?.ip ?? null;
-  const ispText = result?.isp ?? meta?.isp ?? null;
+  const asnText = result?.asn ?? meta?.asn ?? null;
   const dataUsed = result && result.bytesDown !== undefined ? formatBytes((result.bytesDown ?? 0) + (result.bytesUp ?? 0)) : null;
 
   const steps: { key: 'download' | 'upload' | 'ping' | 'connection'; label: string; value: string | null; state: 'pending' | 'active' | 'done' }[] = [
@@ -399,9 +399,9 @@ export default function Home() {
             />
             <StatCard
               icon={<WifiIcon width={20} height={20} />}
-              label="ISP"
-              value={ispText}
-              hint="Your internet provider, looked up from your IP address."
+              label="ASN"
+              value={asnText}
+              hint="The autonomous system number reported by the test network."
             />
             <StatCard
               icon={<GlobeIcon width={20} height={20} />}
