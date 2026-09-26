@@ -4,8 +4,8 @@ export default function Logo({ size = 30 }: { size?: number }) {
       <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden="true" className="logo-mark">
         <defs>
           <linearGradient id="logoGrad" x1="2" y1="26" x2="27" y2="7" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stopColor="#e3b34d" />
-            <stop offset="1" stopColor="#e8432c" />
+            <stop offset="0" stopColor="var(--brand)" />
+            <stop offset="1" stopColor="var(--brand-deep)" />
           </linearGradient>
           <clipPath id="logoClip">
             <rect x="1.4" y="1.4" width="29.2" height="29.2" rx="9" />
