@@ -474,6 +474,38 @@ export default function Home() {
         </section>
 
 
+        {/* ───────── History ───────── */}
+        <section id="history" className="container section">
+          <div className="section-head row">
+            <div>
+              <p className="eyebrow">History</p>
+              <h2>Your recent tests</h2>
+            </div>
+            {history.length > 0 && (
+              <button className="btn btn-ghost" onClick={handleClearHistory}>
+                <TrashIcon width={14} height={14} />
+                Clear
+              </button>
+            )}
+          </div>
+
+          <div className="card history-card">
+            {history.length === 0 ? (
+              <div className="empty">
+                <HistoryIcon width={26} height={26} />
+                <p>No tests yet. Your results will appear here so you can spot trends over time.</p>
+              </div>
+            ) : (
+              <>
+                <HistoryGraph history={history} unit={unit} />
+                <HistoryList history={history} unit={unit} />
+                <p className="fineprint">Stored only in this browser. Nothing is sent to a server.</p>
+              </>
+            )}
+          </div>
+        </section>
+
+
         {/* ───────── Search-friendly guide ───────── */}
         <section id="how-it-works" className="container section seo-content">
           <div className="section-head">
@@ -526,37 +558,6 @@ export default function Home() {
             <p>
               iShowNet runs in the browser, so you can use it on Wi-Fi, Ethernet, mobile data, fiber and other broadband connections without installing a separate speed-test application. Results represent the connection path between your device, network and the iShowNet test service at the time of the test.
             </p>
-          </div>
-        </section>
-
-        {/* ───────── History ───────── */}
-        <section id="history" className="container section">
-          <div className="section-head row">
-            <div>
-              <p className="eyebrow">History</p>
-              <h2>Your recent tests</h2>
-            </div>
-            {history.length > 0 && (
-              <button className="btn btn-ghost" onClick={handleClearHistory}>
-                <TrashIcon width={14} height={14} />
-                Clear
-              </button>
-            )}
-          </div>
-
-          <div className="card history-card">
-            {history.length === 0 ? (
-              <div className="empty">
-                <HistoryIcon width={26} height={26} />
-                <p>No tests yet. Your results will appear here so you can spot trends over time.</p>
-              </div>
-            ) : (
-              <>
-                <HistoryGraph history={history} unit={unit} />
-                <HistoryList history={history} unit={unit} />
-                <p className="fineprint">Stored only in this browser. Nothing is sent to a server.</p>
-              </>
-            )}
           </div>
         </section>
 
