@@ -18,8 +18,11 @@
   --warn: #e3b34d;
   --bad: #e8432c;
 
+  --brand-rgb: 227, 179, 77;
   --brand: #e3b34d;
-  --brand-wash: rgba(227, 179, 77, 0.14);
+  --brand-deep: #c6813f;
+  --brand-wash: rgba(var(--brand-rgb), 0.14);
+  --brand-contrast: #1a1204;
 
   --radius: 16px;
   --radius-sm: 10px;
@@ -42,9 +45,23 @@
   --text-dim: #5c5a60;
   --text-faint: #918e93;
 
-  --brand-wash: rgba(227, 179, 77, 0.18);
-
   color-scheme: light;
+}
+
+[data-accent='purple'] {
+  --brand-rgb: 139, 92, 246;
+  --brand: #8b5cf6;
+  --brand-deep: #6d28d9;
+  --brand-wash: rgba(var(--brand-rgb), 0.14);
+  --brand-contrast: #ffffff;
+}
+
+[data-theme='light'][data-accent='copper'] {
+  --brand-wash: rgba(var(--brand-rgb), 0.18);
+}
+
+[data-theme='light'][data-accent='purple'] {
+  --brand-wash: rgba(var(--brand-rgb), 0.18);
 }
 
 * {
@@ -65,16 +82,16 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   min-height: 100dvh;
-  background-image: radial-gradient(circle at 50% -10%, rgba(227, 179, 77, 0.06), transparent 55%),
-    radial-gradient(circle at 90% 10%, rgba(63, 130, 224, 0.07), transparent 45%),
+  background-image: radial-gradient(circle at 50% -10%, rgba(var(--brand-rgb), 0.06), transparent 55%),
+    radial-gradient(circle at 90% 10%, rgba(var(--brand-rgb), 0.07), transparent 45%),
     radial-gradient(circle at 6% 96%, rgba(16, 26, 48, 0.55), transparent 60%);
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 [data-theme='light'] body {
-  background-image: radial-gradient(circle at 50% -10%, rgba(227, 179, 77, 0.12), transparent 55%),
-    radial-gradient(circle at 90% 10%, rgba(63, 130, 224, 0.09), transparent 45%),
-    radial-gradient(circle at 6% 96%, rgba(63, 130, 224, 0.05), transparent 60%);
+  background-image: radial-gradient(circle at 50% -10%, rgba(var(--brand-rgb), 0.12), transparent 55%),
+    radial-gradient(circle at 90% 10%, rgba(var(--brand-rgb), 0.09), transparent 45%),
+    radial-gradient(circle at 6% 96%, rgba(var(--brand-rgb), 0.05), transparent 60%);
 }
 
 a {
@@ -239,6 +256,19 @@ p {
 
 .theme-toggle:active {
   transform: scale(0.92);
+}
+
+.theme-toggle::after {
+  content: '';
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--brand);
+  box-shadow: 0 0 0 2px var(--surface-2);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .theme-toggle svg {
@@ -506,7 +536,7 @@ p {
 
 .hero-glow.done {
   background:
-    radial-gradient(ellipse at 50% 8%, rgba(63, 130, 224, 0.18), transparent 40%),
+    radial-gradient(ellipse at 50% 8%, rgba(var(--brand-rgb), 0.18), transparent 40%),
     radial-gradient(ellipse at 82% 34%, rgba(10, 16, 36, 0.45), transparent 50%),
     linear-gradient(180deg, rgba(7, 7, 10, 0) 0%, rgba(7, 7, 10, 0.1) 52%, rgba(7, 7, 10, 0.46) 100%);
 }
@@ -554,10 +584,10 @@ p {
 @keyframes ringPulse {
   0%,
   100% {
-    filter: drop-shadow(0 0 16px rgba(227, 179, 77, 0.1));
+    filter: drop-shadow(0 0 16px rgba(var(--brand-rgb), 0.1));
   }
   50% {
-    filter: drop-shadow(0 0 32px rgba(227, 179, 77, 0.24));
+    filter: drop-shadow(0 0 32px rgba(var(--brand-rgb), 0.24));
   }
 }
 
@@ -942,10 +972,9 @@ p {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--gold), var(--copper));
-  color: #17110300;
-  color: #1a1204;
-  box-shadow: 0 10px 30px rgba(227, 179, 77, 0.22);
+  background: linear-gradient(135deg, var(--brand), var(--brand-deep));
+  color: var(--brand-contrast);
+  box-shadow: 0 10px 30px rgba(var(--brand-rgb), 0.22);
 }
 
 .btn-primary:hover {
