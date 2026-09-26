@@ -48,47 +48,19 @@ export const metadata: Metadata = {
     siteName: 'iShowNet',
     type: 'website',
     locale: 'en_US',
-    images: [
-      {
-        url: '/opengraph-image',
-        width: 1200,
-        height: 630,
-        alt: 'iShowNet internet speed test',
-      },
-    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Internet Speed Test — Download, Upload & Ping | iShowNet',
     description:
       'Test download, upload, ping, jitter, packet loss and bufferbloat in your browser with iShowNet.',
-    images: ['/twitter-image'],
   },
-};
-
-
-
-const webApplicationJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'WebApplication',
-  name: 'iShowNet',
-  url: siteUrl,
-  description:
-    'A browser-based internet speed and connection quality test for download, upload, ping, jitter, packet loss and bufferbloat.',
-  applicationCategory: 'UtilitiesApplication',
-  operatingSystem: 'Web Browser',
-  browserRequirements: 'Requires JavaScript and a modern web browser.',
-  isAccessibleForFree: true,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(webApplicationJsonLd) }}
-        />
         <script
           id="theme-init"
           dangerouslySetInnerHTML={{
