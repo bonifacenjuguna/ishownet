@@ -18,7 +18,7 @@ function isIOS() {
   return /iphone|ipad|ipod/i.test(navigator.userAgent) && !('MSStream' in window);
 }
 
-export default function InstallApp() {
+export default function InstallApp({ enabled = true }: { enabled?: boolean }) {
   const [promptEvent, setPromptEvent] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
   const [ios, setIos] = useState(false);
@@ -66,7 +66,7 @@ export default function InstallApp() {
     }
   }
 
-  if (installed || (!promptEvent && !ios)) return null;
+  if (!enabled || installed || (!promptEvent && !ios)) return null;
 
   return (
     <section className="container section install-section" aria-labelledby="install-heading">
