@@ -1,26 +1,25 @@
 # iShowNet
 
-A real, animated internet speed test for measuring ping, jitter, packet loss, download, upload, and bufferbloat.
+A browser-based internet speed test that measures real connection performance.
 
 **Live:** https://ishownet.vercel.app
 
-## What it measures
+## Measures
 
-- **Ping / jitter** — real round trips against an Edge Function that returns `204` instantly. The first ping is discarded because it pays for DNS/TLS setup, not real latency.
-- **Download / upload** — real transfers. Download requests a fixed 16 MiB random (incompressible) payload from an Edge Function across adaptive parallel connections; upload sends random payloads via `XMLHttpRequest` across 3 parallel connections. The first ~1.5s of each transfer (TCP slow-start) is excluded from the final number.
-- **Bufferbloat** — idle ping is measured first, then ping is measured again while download and upload saturate the link. The increase is graded A–F using thresholds similar to common bufferbloat testing tools. This is a proxy, not a lab-grade measurement.
-- **Packet loss** — approximated as the percentage of ping requests that time out or fail. HTTP/TCP cannot see raw UDP packet loss, so treat this as an estimate.
-- **IP / location** — IP and city/country come from Vercel edge geolocation headers. The network identifier is exposed as an ASN, not an ISP name.
-- **Network type** — read from the browser's `navigator.connection` API where available. Safari and Firefox may fall back to "Not reported".
-- **History / trend graph** — stored in `localStorage` only. Nothing is sent to a server; clearing browser data clears the history.
+- Ping and jitter
+- Packet loss estimate
+- Download and upload throughput
+- Latency while the connection is under load
+- Bufferbloat grade
+- Network type, IP, ASN, and edge location
+- Local test history
+- Practical activity guidance for calls, streaming, gaming, cloud gaming, and live streaming
 
-## Design
+## How it works
 
-- One ring, one job: it shows the measurement in progress or, after a test, the selected download/upload result.
-- Metrics such as ping, jitter, packet loss, bufferbloat, location, IP, connection type, and data used live in responsive result cards.
-- An **Insights** section translates the measurements into practical activities such as calls, streaming, gaming, cloud gaming, and live streaming.
-- A unit toggle supports Mbps and MB/s.
-- The interface supports dark and light themes.
+The browser talks to small same-origin Edge endpoints for ping, download, upload, and connection metadata. Throughput uses adaptive parallel requests and measures sustained transfer performance rather than displaying invented frontend values.
+
+Results and history stay in the browser. No account or environment variables are required.
 
 ## Local development
 
@@ -31,40 +30,48 @@ npm run dev
 
 Open http://localhost:3000.
 
-## Deploy to Vercel
-
-```bash
-npm install -g vercel
-vercel
-vercel --prod
-```
-
-Or import this repository into Vercel and deploy. No environment variables are required.
-
 ## Project structure
 
 ```
 app/
-  page.tsx              main UI
-  layout.tsx            metadata, fonts, and global shell
-  globals.css           design tokens and component styles
-  api/ping/route.ts     latency probe
-  api/download/route.ts streamed download payload
-  api/upload/route.ts   upload sink
-  api/meta/route.ts     IP / geo from Vercel edge headers
+  page.tsx
+  layout.tsx
+  globals.css
+  api/
+    ping/route.ts
+    download/route.ts
+    upload/route.ts
+    meta/route.ts
+
 components/
-  Header.tsx, Footer.tsx, Logo.tsx, ThemeToggle.tsx
-  SpeedRing.tsx, Waveform.tsx, StatCard.tsx
-  ActivityList.tsx, HistoryGraph.tsx, HistoryList.tsx
-  ResultCard.tsx        shareable result card
+  Header.tsx
+  Footer.tsx
+  Logo.tsx
+  ThemeToggle.tsx
+  SpeedRing.tsx
+  Waveform.tsx
+  StatCard.tsx
+  ActivityList.tsx
+  HistoryGraph.tsx
+  HistoryList.tsx
+  ResultCard.tsx
+  icons.tsx
+
+hooks/
+  useSynchronizedMetric.ts
+
 lib/
-  engine.ts             test orchestration
-  edgeHandlers.ts       Edge Runtime handlers
-  constants.ts          shared measurement protocol constants
-  format.ts             formatting and activity logic
-  storage.ts             local history
-  types.ts               shared TypeScript types
+  engine.ts
+  edgeHandlers.ts
+  constants.ts
+  format.ts
+  storage.ts
+  types.ts
 ```
+
+## Deployment
+
+The repository is connected to Vercel. Push to `main`, let Vercel build the commit, then monitor the deployment.
 
 ## License
 
