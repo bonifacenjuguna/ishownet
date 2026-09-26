@@ -22,10 +22,19 @@ const WIDTH_IN = 11;
 const CIRC_OUT = 2 * Math.PI * R_OUT;
 const CIRC_IN = 2 * Math.PI * R_IN;
 
-/** Log-ish scale so 5 Mbps and 500 Mbps both read sensibly on the same dial. */
-function fraction(mbps: number): number {
-  const cap = Math.max(1000, mbps * 1.1);
-  return Math.max(0, Math.min(1, Math.log10(1 + mbps) / Math.log10(1 + cap)));
+/**
+ * Fixed speedometer scale:
+ * - 1,000 Mbps (125 MB/s) = full scale
+ * - 500 Mbps (62.5 MB/s) = just under halfway
+ *
+ * The curve is intentionally slightly steeper than linear so very fast
+ * connections do not pin the dial near the end too early.
+ */
+function fraction(mbps: number, unit: SpeedUnit): number {
+  const displaySpeed = unit === 'MB/s' ? mbps / 8 : mbps;
+  const fullScale = unit === 'MB/s' ? 125 : 1000;
+  const normalized = Math.max(0, displaySpeed) / fullScale;
+  return Math.max(0, Math.min(1, normalized ** 1.1));
 }
 
 export default function SpeedRing({ down, up, centerMbps, unit, label, scanning, running, priming }: SpeedRingProps) {
@@ -83,7 +92,7 @@ export default function SpeedRing({ down, up, centerMbps, unit, label, scanning,
           strokeWidth={WIDTH_OUT}
           strokeLinecap="round"
           strokeDasharray={CIRC_OUT}
-          strokeDashoffset={CIRC_OUT * (1 - fraction(down))}
+          strokeDashoffset={CIRC_OUT * (1 - fraction(down, unit))}
           transform={`rotate(-90 ${C} ${C})`}
           filter="url(#ringGlow)"
           className="ring-arc"
@@ -98,7 +107,7 @@ export default function SpeedRing({ down, up, centerMbps, unit, label, scanning,
           strokeWidth={WIDTH_IN}
           strokeLinecap="round"
           strokeDasharray={CIRC_IN}
-          strokeDashoffset={CIRC_IN * (1 - fraction(up))}
+          strokeDashoffset={CIRC_IN * (1 - fraction(up, unit))}
           transform={`rotate(-90 ${C} ${C})`}
           filter="url(#ringGlow)"
           className="ring-arc"
