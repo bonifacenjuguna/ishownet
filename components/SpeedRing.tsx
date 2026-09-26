@@ -6,7 +6,6 @@ interface SpeedRingProps {
   down: number; // mbps, drives the outer arc
   up: number; // mbps, drives the inner arc
   centerMbps: number; // mbps shown in the big number
-  snapKey: string; // when this changes the number jumps instead of easing
   unit: SpeedUnit;
   label: string;
   scanning: boolean;
@@ -29,7 +28,7 @@ function fraction(mbps: number): number {
   return Math.max(0, Math.min(1, Math.log10(1 + mbps) / Math.log10(1 + cap)));
 }
 
-export default function SpeedRing({ down, up, centerMbps, snapKey, unit, label, scanning, running, priming }: SpeedRingProps) {
+export default function SpeedRing({ down, up, centerMbps, unit, label, scanning, running, priming }: SpeedRingProps) {
   // centerMbps is already the shared synchronized presentation value.
   // The ring must not apply a second independent animation layer.
   const display = formatSpeed(centerMbps, unit, 1);
