@@ -47,12 +47,30 @@ async function measurePing(
     }
   }
 
-  const avg = samples.length ? samples.reduce((a, b) => a + b, 0) / samples.length : 0;
-  let jitterSum = 0;
-  for (let i = 1; i < samples.length; i++) jitterSum += Math.abs(samples[i] - samples[i - 1]);
-  const jitter = samples.length > 1 ? jitterSum / (samples.length - 1) : 0;
+  // Small RTT samples are noisy: one DNS/TLS hiccup or a scheduler pause should
+  // not become the user's "normal" ping. Use a trimmed mean for the displayed
+  // baseline, while retaining every attempt for packet-loss accounting.
+  const sorted = [...samples].sort((a, b) => a - b);
+  let robustSamples = sorted;
+  if (sorted.length >= 6) {
+    const trim = Math.max(1, Math.floor(sorted.length * 0.1));
+    robustSamples = sorted.slice(trim, sorted.length - trim);
+  }
+  const avg = robustSamples.length
+    ? robustSamples.reduce((a, b) => a + b, 0) / robustSamples.length
+    : 0;
+
+  // Jitter is based on consecutive RTT changes, but use the median absolute
+  // change so one isolated spike cannot dominate the result.
+  const deltas: number[] = [];
+  for (let i = 1; i < samples.length; i++) deltas.push(Math.abs(samples[i] - samples[i - 1]));
+  deltas.sort((a, b) => a - b);
+  const jitter = deltas.length
+    ? deltas[Math.floor(deltas.length / 2)]
+    : 0;
+
   const lossPct = attempted > 0 ? (lost / attempted) * 100 : 0;
-  return { avg, jitter, lossPct };
+  return { avg, jitter, lossPct, lost, attempted };
 }
 
 interface ThroughputResult {
@@ -71,8 +89,16 @@ interface ThroughputResult {
  *  the way a plain average-of-rates would. Falls back to `fallback` (the whole-test
  *  overall average) if there aren't enough steady-state samples to trust. */
 function timeWeightedAverage(trace: TracePoint[], cutoffT: number, fallback: number): number {
-  const steadyCount = trace.filter((p) => p.t >= cutoffT).length;
-  if (steadyCount < 4) return fallback;
+  const steady = trace.filter((p) => p.t >= cutoffT && Number.isFinite(p.mbps) && p.mbps >= 0);
+  if (steady.length < 4) return fallback;
+
+  // Winsorize the steady-state samples at their 10th/90th percentiles before
+  // time-weighting. This keeps real sustained changes while suppressing a
+  // single browser scheduling/network spike from moving the final result.
+  const sorted = steady.map((p) => p.mbps).sort((a, b) => a - b);
+  const percentile = (q: number) => sorted[Math.min(sorted.length - 1, Math.floor((sorted.length - 1) * q))];
+  const lo = percentile(0.1);
+  const hi = percentile(0.9);
 
   let weightedSum = 0;
   let totalWeight = 0;
@@ -80,7 +106,8 @@ function timeWeightedAverage(trace: TracePoint[], cutoffT: number, fallback: num
     if (trace[i].t < cutoffT) continue;
     const prevT = i === 0 ? cutoffT : trace[i - 1].t;
     const weight = Math.max(1, trace[i].t - prevT);
-    weightedSum += trace[i].mbps * weight;
+    const value = Math.min(hi, Math.max(lo, trace[i].mbps));
+    weightedSum += value * weight;
     totalWeight += weight;
   }
   return totalWeight > 0 ? weightedSum / totalWeight : fallback;
@@ -343,16 +370,33 @@ export async function runFullTest(cb: EngineCallbacks = {}): Promise<TestResult>
   // finished by now (they started early and run alongside the transfers), but
   // cap the wait so a slow/congested network can never leave the "Test again"
   // button hanging — fall back to the idle ping if the cap is hit.
-  const fallbackPing = { avg: idlePing.avg, jitter: idlePing.jitter, lossPct: idlePing.lossPct };
+  const fallbackPing = {
+    avg: idlePing.avg,
+    jitter: idlePing.jitter,
+    lossPct: 0,
+    lost: 0,
+    attempted: 0,
+  };
   const capped = <T>(p: Promise<T>, fallback: T, ms: number) =>
     Promise.race([p, sleep(ms).then(() => fallback)]);
   const [loadedDown, loadedUp] = await Promise.all([
     capped(loadedDuringDown, fallbackPing, 2000),
     capped(loadedDuringUp, fallbackPing, 2000),
   ]);
+
+  // Keep the direction-specific loaded latencies for diagnostics. Bufferbloat
+  // uses the worse direction because either saturated direction can make an
+  // interactive connection feel laggy.
   const loadedAvg = Math.max(loadedDown.avg, loadedUp.avg);
   const bufferbloatMs = Math.max(0, loadedAvg - idlePing.avg);
-  const packetLossPct = Math.max(idlePing.lossPct, loadedDown.lossPct, loadedUp.lossPct);
+
+  // Loss is a sample-count problem as well as a percentage problem. Combine
+  // all observed attempts instead of taking the maximum of three tiny samples;
+  // this prevents one lost packet in a 6-ping probe from dominating the whole
+  // test while still preserving genuine loss.
+  const lossLost = idlePing.lost + loadedDown.lost + loadedUp.lost;
+  const lossAttempts = idlePing.attempted + loadedDown.attempted + loadedUp.attempted;
+  const packetLossPct = lossAttempts > 0 ? (lossLost / lossAttempts) * 100 : 0;
 
   let meta: { ip: string | null; asn: string | null; city: string | null; country: string | null } = {
     ip: null,
