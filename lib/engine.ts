@@ -1,4 +1,5 @@
 import type { BufferbloatGrade, TestPhase, TestResult, TracePoint } from './types';
+import { DOWNLOAD_SIZE_BYTES } from './constants';
 
 const API = '/api';
 
@@ -197,11 +198,7 @@ async function measureAdaptive(
   return { mbps, bytes: totalBytes, trace, streamsUsed: settledStreams, durationMs: elapsed * 1000 };
 }
 
-// Matches the backend's random-data pool exactly (see edgeHandlers.ts) — the pool is
-// sized so a single response can never wrap and repeat, so requesting right up to
-// that size is safe and minimizes how often a fast, highly-parallel download needs
-// to re-request.
-const DOWNLOAD_CHUNK_BYTES = 16 * 1024 * 1024;
+// Shared with the Edge download handler so the client and server use one protocol contract.
 
 async function measureDownload(onSample?: (mbps: number) => void): Promise<ThroughputResult> {
   const url = `${API}/download`;
@@ -213,7 +210,7 @@ async function measureDownload(onSample?: (mbps: number) => void): Promise<Throu
       // of the adaptive deadline, which isn't known in advance inside this worker.
       const hangGuard = setTimeout(() => controller.abort(), 20000);
       try {
-        const res = await fetch(`${url}?bytes=${DOWNLOAD_CHUNK_BYTES}&_=${Date.now()}`, {
+        const res = await fetch(`${url}?bytes=${DOWNLOAD_SIZE_BYTES}&_=${Date.now()}`, {
           cache: 'no-store',
           signal: controller.signal,
         });
@@ -357,14 +354,14 @@ export async function runFullTest(cb: EngineCallbacks = {}): Promise<TestResult>
   const bufferbloatMs = Math.max(0, loadedAvg - idlePing.avg);
   const packetLossPct = Math.max(idlePing.lossPct, loadedDown.lossPct, loadedUp.lossPct);
 
-  let meta: { ip: string | null; isp: string | null; city: string | null; country: string | null } = {
+  let meta: { ip: string | null; asn: string | null; city: string | null; country: string | null } = {
     ip: null,
-    isp: null,
+    asn: null,
     city: null,
     country: null,
   };
   const metaData = await capped(metaPromise, null, 800);
-  if (metaData) meta = { ip: metaData.ip, isp: metaData.isp, city: metaData.city, country: metaData.country };
+  if (metaData) meta = { ip: metaData.ip, asn: metaData.asn, city: metaData.city, country: metaData.country };
 
   cb.onPhase?.('done');
 
@@ -391,7 +388,7 @@ export async function runFullTest(cb: EngineCallbacks = {}): Promise<TestResult>
     downloadDurationMs: download.durationMs,
     uploadDurationMs: upload.durationMs,
     ip: meta.ip,
-    isp: meta.isp,
+    asn: meta.asn,
     city: meta.city,
     country: meta.country,
     networkType: detectNetworkType(),
