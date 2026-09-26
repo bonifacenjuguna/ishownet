@@ -38,7 +38,7 @@ export interface TestResult {
 
 export interface MetaInfo {
   ip: string | null;
-  isp: string | null;
+  asn: string | null;
   city: string | null;
   region: string | null;
   country: string | null;
