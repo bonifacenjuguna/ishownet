@@ -57,52 +57,100 @@ export interface Activity {
   level: Level;
 }
 
-/** Turns raw numbers into "what can I actually do with this?" verdicts. */
-export function buildActivities(r: { down: number; up: number; ping: number; jitter: number; loss: number }): Activity[] {
-  const { down, up, ping, jitter, loss } = r;
+type ActivityMetrics = {
+  down: number;
+  up: number;
+  ping: number;
+  jitter: number;
+  loss: number;
+  downloadLatency?: number;
+  uploadLatency?: number;
+  bufferbloat?: number;
+};
+
+/**
+ * Turns measurements into real-life verdicts.
+ *
+ * Speed is only one part of the decision. Interactive activities are gated by
+ * latency/jitter/loss, while streaming is primarily throughput-driven. Loaded
+ * latency is used where congestion can visibly affect the experience.
+ */
+export function buildActivities(r: ActivityMetrics): Activity[] {
+  const down = Math.max(0, r.down);
+  const up = Math.max(0, r.up);
+  const ping = Math.max(0, r.ping);
+  const jitter = Math.max(0, r.jitter);
+  const loss = Math.max(0, r.loss);
+  const downLatency = Math.max(0, r.downloadLatency ?? ping);
+  const upLatency = Math.max(0, r.uploadLatency ?? ping);
+  const loadedLatency = Math.max(downLatency, upLatency);
+  const bufferbloat = Math.max(0, r.bufferbloat ?? Math.max(0, loadedLatency - ping));
+
   const pick = (great: boolean, ok: boolean): Level => (great ? 'great' : ok ? 'ok' : 'poor');
+
   return [
     {
       id: 'social',
       name: 'Social & messaging',
       need: 'Chats, posts, reels, stories & DMs',
-      level: pick(down >= 10 && up >= 5 && ping < 150 && loss < 2, down >= 3 && up >= 1.5 && ping < 250 && loss < 5),
+      level: pick(
+        down >= 8 && up >= 3 && ping < 120 && jitter < 30 && loss < 1,
+        down >= 2 && up >= 0.8 && ping < 250 && jitter < 60 && loss < 5
+      ),
     },
     {
       id: 'calls',
       name: 'Video calls',
       need: 'Zoom, Meet, Teams in HD',
-      level: pick(down >= 8 && up >= 4 && ping < 100 && loss < 1, down >= 3 && up >= 1.5 && ping < 200),
+      level: pick(
+        down >= 8 && up >= 4 && ping < 80 && jitter < 20 && loss < 1 && loadedLatency < 120,
+        down >= 3 && up >= 1.5 && ping < 150 && jitter < 35 && loss < 3 && loadedLatency < 200
+      ),
     },
     {
       id: 'hd',
       name: 'HD streaming',
       need: '1080p on Netflix, YouTube',
-      level: pick(down >= 15, down >= 5),
+      level: pick(
+        down >= 10 && loss < 2 && bufferbloat < 100,
+        down >= 5 && loss < 5
+      ),
     },
     {
       id: '4k',
       name: '4K streaming',
-      need: 'Ultra HD, about 25 Mbps',
-      level: pick(down >= 40, down >= 25),
+      need: 'Ultra HD, about 15 Mbps',
+      level: pick(
+        down >= 25 && loss < 2 && bufferbloat < 100,
+        down >= 15 && loss < 5
+      ),
     },
     {
       id: 'gaming',
       name: 'Online gaming',
       need: 'Low ping and steady jitter',
-      level: pick(ping < 40 && jitter < 15 && loss < 1, ping < 80 && jitter < 30 && loss < 3),
+      level: pick(
+        down >= 5 && up >= 2 && ping < 50 && jitter < 15 && loss < 1 && loadedLatency < 100,
+        down >= 3 && up >= 1 && ping < 100 && jitter < 30 && loss < 3 && loadedLatency < 180
+      ),
     },
     {
       id: 'cloud',
       name: 'Cloud gaming',
-      need: 'GeForce Now, Xbox Cloud',
-      level: pick(down >= 35 && ping < 40 && jitter < 15, down >= 15 && ping < 80),
+      need: 'GeForce NOW, Xbox Cloud',
+      level: pick(
+        down >= 35 && up >= 5 && ping < 50 && jitter < 15 && loss < 1 && loadedLatency < 100 && bufferbloat < 40,
+        down >= 15 && up >= 3 && ping < 90 && jitter < 30 && loss < 3 && loadedLatency < 180 && bufferbloat < 90
+      ),
     },
     {
       id: 'live',
       name: 'Live streaming',
       need: 'Going live in 1080p',
-      level: pick(up >= 10, up >= 5),
+      level: pick(
+        up >= 10 && upLatency < 120 && loss < 1 && jitter < 20,
+        up >= 5 && upLatency < 200 && loss < 3 && jitter < 40
+      ),
     },
   ];
 }
