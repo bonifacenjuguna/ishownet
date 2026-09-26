@@ -484,14 +484,21 @@ p {
 
 .hero-glow {
   position: absolute;
-  inset: -20% -10% auto -10%;
-  height: 440px;
-  background: radial-gradient(ellipse at 50% 0%, var(--brand-wash), transparent 60%),
-    radial-gradient(ellipse at 82% 25%, rgba(18, 34, 64, 0.4), transparent 65%);
+  inset: 0;
+  height: 100%;
+  background:
+    radial-gradient(ellipse at 50% 6%, rgba(227, 179, 77, 0.12), transparent 38%),
+    radial-gradient(ellipse at 82% 34%, rgba(18, 34, 64, 0.42), transparent 48%),
+    linear-gradient(180deg, rgba(7, 7, 10, 0) 0%, rgba(7, 7, 10, 0.12) 52%, rgba(7, 7, 10, 0.42) 100%);
   pointer-events: none;
-  opacity: 0.7;
+  opacity: 0.85;
   transition: opacity 0.6s ease, background 0.6s ease;
-  z-index: -1;
+  z-index: 0;
+}
+
+.hero > *:not(.hero-glow) {
+  position: relative;
+  z-index: 1;
 }
 
 .hero-glow.on {
@@ -499,8 +506,10 @@ p {
 }
 
 .hero-glow.done {
-  background: radial-gradient(ellipse at 50% 0%, rgba(63, 130, 224, 0.18), transparent 60%),
-    radial-gradient(ellipse at 82% 25%, rgba(10, 16, 36, 0.45), transparent 65%);
+  background:
+    radial-gradient(ellipse at 50% 8%, rgba(63, 130, 224, 0.18), transparent 40%),
+    radial-gradient(ellipse at 82% 34%, rgba(10, 16, 36, 0.45), transparent 50%),
+    linear-gradient(180deg, rgba(7, 7, 10, 0) 0%, rgba(7, 7, 10, 0.1) 52%, rgba(7, 7, 10, 0.46) 100%);
 }
 
 .hero-title {
@@ -1440,3 +1449,73 @@ p {
     padding: 0 16px;
   }
 }
+
+
+/* ───────── History controls ───────── */
+
+.history-more {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 2px;
+  padding: 13px 14px;
+  border: 1px solid var(--stroke);
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.15s ease;
+}
+
+.history-more:hover {
+  border-color: color-mix(in srgb, var(--brand) 42%, var(--stroke));
+  background: color-mix(in srgb, var(--brand-wash) 45%, var(--surface-2));
+}
+
+.history-more:active {
+  transform: scale(0.995);
+}
+
+.history-more > span:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.history-more small {
+  color: var(--text-faint);
+  font-size: 0.7rem;
+  font-weight: 400;
+}
+
+.history-more-icon {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--stroke);
+  border-radius: 999px;
+  color: var(--text-dim);
+  transition: transform 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.history-more-icon.is-open {
+  transform: rotate(180deg);
+  color: var(--brand);
+  border-color: color-mix(in srgb, var(--brand) 42%, var(--stroke));
+}
+
+/* ───────── Export card action layout ───────── */
+
+.card-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
