@@ -10,7 +10,6 @@ import ActivityList from '@/components/ActivityList';
 import HistoryGraph from '@/components/HistoryGraph';
 import HistoryList from '@/components/HistoryList';
 import InstallApp from '@/components/InstallApp';
-import CloudflareCompare from '@/components/CloudflareCompare';
 import ResultCard from '@/components/ResultCard';
 import {
   BoltIcon,
@@ -45,7 +44,7 @@ import {
   type Level,
   type SpeedUnit,
 } from '@/lib/format';
-import type { MetaInfo, TestPhase, TestResult } from '@/lib/types';
+import type { TestPhase, TestResult } from '@/lib/types';
 import { useSynchronizedMetric } from '@/hooks/useSynchronizedMetric';
 
 type Focus = 'download' | 'upload';
@@ -85,7 +84,6 @@ export default function Home() {
   const [result, setResult] = useState<TestResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<TestResult[]>([]);
-  const [meta, setMeta] = useState<MetaInfo | null>(null);
   const [networkType, setNetworkType] = useState('Unknown');
   const [showIp, setShowIp] = useState(false);
 
@@ -110,10 +108,6 @@ export default function Home() {
   useEffect(() => {
     setHistory(loadHistory());
     setNetworkType(detectNetworkType());
-    fetch('/api/meta', { cache: 'no-store' })
-      .then((r) => r.json())
-      .then((m: MetaInfo) => setMeta(m))
-      .catch(() => {});
   }, []);
 
   async function handleRun() {
@@ -222,7 +216,7 @@ export default function Home() {
     : null;
   const greatCount = activities ? activities.filter((a) => a.level === 'great').length : 0;
 
-  const locationText = [result?.city ?? meta?.city, result?.country ?? meta?.country].filter(Boolean).join(', ');
+  const locationText = [result?.city, result?.country].filter(Boolean).join(', ');
   const ipText = result?.ip ?? meta?.ip ?? null;
   const asnText = result?.asn ?? meta?.asn ?? null;
   const dataUsed = result && result.bytesDown !== undefined ? formatBytes((result.bytesDown ?? 0) + (result.bytesUp ?? 0)) : null;
@@ -509,8 +503,6 @@ export default function Home() {
 
 
         <InstallApp enabled={Boolean(result)} />
-
-        {isDone && <CloudflareCompare />}
 
         {/* ───────── Search-friendly guide ───────── */}
         <section id="how-it-works" className="container section seo-content">
