@@ -375,7 +375,7 @@ export default function Home() {
               label="Packet loss"
               value={isDone ? (result!.packetLossPct === null ? '—' : result!.packetLossPct.toFixed(1)) : null}
               unit="%"
-              level={isDone ? lossLevel(result!.packetLossPct) : undefined}
+              level={isDone && result!.packetLossPct !== null ? lossLevel(result!.packetLossPct) : undefined}
               hint="Requests that never came back. Anything above zero can cause glitches."
             />
             <StatCard
