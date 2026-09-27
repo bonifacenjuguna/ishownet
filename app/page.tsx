@@ -208,7 +208,7 @@ export default function Home() {
         up: result!.uploadMbps,
         ping: result!.pingMs,
         jitter: result!.jitterMs,
-        loss: result!.packetLossPct,
+        loss: result!.packetLossPct ?? 0,
         downloadLatency: result!.downloadLatencyMs,
         uploadLatency: result!.uploadLatencyMs,
         bufferbloat: result!.bufferbloatMs,
@@ -373,7 +373,7 @@ export default function Home() {
             <StatCard
               icon={<PacketLossIcon width={20} height={20} />}
               label="Packet loss"
-              value={isDone ? result!.packetLossPct.toFixed(1) : null}
+              value={isDone ? (result!.packetLossPct === null ? '—' : result!.packetLossPct.toFixed(1)) : null}
               unit="%"
               level={isDone ? lossLevel(result!.packetLossPct) : undefined}
               hint="Requests that never came back. Anything above zero can cause glitches."
