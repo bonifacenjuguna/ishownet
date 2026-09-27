@@ -135,25 +135,37 @@ export function runFullTest(callbacks: Callbacks = {}): Promise<TestResult> {
         if (typeof up === 'number' && up > 0) {
           lastUp = up / 1e6;
           callbacks.onLive?.('upload', lastUp);
-        } else if (uploadStartedAt > 0) {
-          // Cloudflare can spend a while in an upload measurement without
-          // exposing a new bandwidth value. Use bytes already transferred by
-          // the engine to keep the UI visibly live without inventing samples.
-          const elapsedSeconds = (performance.now() - uploadStartedAt) / 1000;
-          const uploadBytes = transferred(r.getUploadBandwidthPoints());
-          if (uploadBytes > 0 && elapsedSeconds > 0.15) {
-            const liveMbps = (uploadBytes * 8) / elapsedSeconds / 1e6;
-            if (Number.isFinite(liveMbps) && liveMbps > 0) {
-              lastUp = liveMbps;
-              callbacks.onLive?.('upload', liveMbps);
-            }
-          }
         }
 
         if (typeof ping === 'number' && ping > 0) {
           lastPing = ping;
           lastJitter = typeof jitter === 'number' ? jitter : lastJitter;
           callbacks.onPingLive?.(lastPing, lastJitter);
+        }
+      };
+
+      // Upload-only heartbeat. It deliberately does not read or publish
+      // download state, keeping the working download path untouched.
+      const publishUploadHeartbeat = () => {
+        if (uploadStartedAt <= 0) return;
+
+        const r = engine.results;
+        const up = r.getUploadBandwidth();
+
+        if (typeof up === 'number' && up > 0) {
+          lastUp = up / 1e6;
+          callbacks.onLive?.('upload', lastUp);
+          return;
+        }
+
+        const elapsedSeconds = (performance.now() - uploadStartedAt) / 1000;
+        const uploadBytes = transferred(r.getUploadBandwidthPoints());
+        if (uploadBytes > 0 && elapsedSeconds > 0.15) {
+          const liveMbps = (uploadBytes * 8) / elapsedSeconds / 1e6;
+          if (Number.isFinite(liveMbps) && liveMbps > 0) {
+            lastUp = liveMbps;
+            callbacks.onLive?.('upload', liveMbps);
+          }
         }
       };
 
@@ -167,10 +179,10 @@ export function runFullTest(callbacks: Callbacks = {}): Promise<TestResult> {
           sawUpload = true;
           uploadStartedAt = performance.now();
           stopUploadTicker();
-          uploadTicker = window.setInterval(publish, 120);
+          uploadTicker = window.setInterval(publishUploadHeartbeat, 120);
           if (lastDown > 0) callbacks.onStage?.('download', lastDown);
           callbacks.onPhase?.('upload');
-          publish();
+          publishUploadHeartbeat();
         }
       };
 
