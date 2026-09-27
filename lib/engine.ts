@@ -37,28 +37,6 @@ type Engine = {
   play: () => void;
 };
 
-const MEASUREMENTS: Array<{
-  type: 'latency' | 'download' | 'upload';
-  numPackets?: number;
-  bytes?: number;
-  count?: number;
-  bypassMinDuration?: boolean;
-}> = [
-  { type: 'latency', numPackets: 1 },
-  { type: 'download', bytes: 1e5, count: 1, bypassMinDuration: true },
-  { type: 'latency', numPackets: 20 },
-  { type: 'download', bytes: 1e5, count: 9 },
-  { type: 'download', bytes: 1e6, count: 8 },
-  { type: 'upload', bytes: 1e5, count: 8 },
-  { type: 'upload', bytes: 1e6, count: 6 },
-  { type: 'download', bytes: 1e7, count: 6 },
-  { type: 'upload', bytes: 1e7, count: 4 },
-  { type: 'download', bytes: 2.5e7, count: 4 },
-  { type: 'upload', bytes: 2.5e7, count: 4 },
-  { type: 'download', bytes: 1e8, count: 3 },
-  { type: 'upload', bytes: 5e7, count: 3 },
-  { type: 'download', bytes: 2.5e8, count: 2 },
-];
 
 async function fetchMeta(): Promise<CloudflareMeta> {
   try {
@@ -109,7 +87,22 @@ export function runFullTest(callbacks: Callbacks = {}): Promise<TestResult> {
 
       const engine = new SpeedTest({
         autoStart: false,
-        measurements: MEASUREMENTS,
+        measurements: [
+          { type: 'latency', numPackets: 1 },
+          { type: 'download', bytes: 1e5, count: 1, bypassMinDuration: true },
+          { type: 'latency', numPackets: 20 },
+          { type: 'download', bytes: 1e5, count: 9 },
+          { type: 'download', bytes: 1e6, count: 8 },
+          { type: 'upload', bytes: 1e5, count: 8 },
+          { type: 'upload', bytes: 1e6, count: 6 },
+          { type: 'download', bytes: 1e7, count: 6 },
+          { type: 'upload', bytes: 1e7, count: 4 },
+          { type: 'download', bytes: 2.5e7, count: 4 },
+          { type: 'upload', bytes: 2.5e7, count: 4 },
+          { type: 'download', bytes: 1e8, count: 3 },
+          { type: 'upload', bytes: 5e7, count: 3 },
+          { type: 'download', bytes: 2.5e8, count: 2 },
+        ],
       }) as unknown as Engine;
 
       let sawDownload = false;
