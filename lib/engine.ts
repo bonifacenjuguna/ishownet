@@ -161,15 +161,35 @@ async function measureAdaptive(
     windowBytes += n;
   };
 
+  // Browser fetch/XHR progress events can arrive in bursts because data may be
+  // buffered before JavaScript gets scheduled. A tiny 200 ms bucket can therefore
+  // report impossible-looking transient peaks (for example 1000+ Mbps on a
+  // connection that settles near 12 Mbps). Keep the measurement itself unchanged,
+  // but use a longer rolling window for the live display so those transport bursts
+  // do not become visible speed spikes.
+  const liveRates: number[] = [];
+  const LIVE_WINDOW_MS = 600;
   const sampleTimer = setInterval(() => {
     const now = performance.now();
     const seconds = (now - windowStart) / 1000;
     const mbps = seconds > 0 ? (windowBytes * 8) / 1e6 / seconds : 0;
+    liveRates.push(mbps);
+    if (liveRates.length > 5) liveRates.shift();
+
+    const sortedLive = [...liveRates].sort((a, b) => a - b);
+    const middle = Math.floor(sortedLive.length / 2);
+    const liveDisplayMbps =
+      sortedLive.length >= 3
+        ? sortedLive.length % 2
+          ? sortedLive[middle]
+          : (sortedLive[middle - 1] + sortedLive[middle]) / 2
+        : mbps;
+
     trace.push({ t: now - start, mbps });
-    onSample?.(mbps);
+    onSample?.(liveDisplayMbps);
     windowBytes = 0;
     windowStart = now;
-  }, 200);
+  }, LIVE_WINDOW_MS);
 
   const workers: Promise<void>[] = [];
   function ensureStreams(n: number) {
