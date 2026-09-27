@@ -8,9 +8,26 @@ interface CloudflareResult {
   pingMs: number;
 }
 
-const DOWNLOAD_BYTES = 25_000_000;
-const UPLOAD_BYTES = 25_000_000;
+const DOWNLOAD_BYTES = 10_000_000;
+const UPLOAD_BYTES = 10_000_000;
 const RUNS = 3;
+const REQUEST_TIMEOUT_MS = 30_000;
+
+async function fetchWithTimeout(input: RequestInfo | URL, init: RequestInit = {}): Promise<Response> {
+  const controller = new AbortController();
+  const timer = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  try {
+    return await fetch(input, { ...init, signal: controller.signal });
+  } catch (error) {
+    if (controller.signal.aborted) {
+      throw new Error('Cloudflare request timed out.');
+    }
+    throw error;
+  } finally {
+    window.clearTimeout(timer);
+  }
+}
 
 function median(values: number[]): number {
   const sorted = [...values].sort((a, b) => a - b);
@@ -22,7 +39,7 @@ async function measureDownload(): Promise<number[]> {
 
   for (let i = 0; i < RUNS; i++) {
     const start = performance.now();
-    const response = await fetch(
+    const response = await fetchWithTimeout(
       `https://speed.cloudflare.com/__down?bytes=${DOWNLOAD_BYTES}&_=${Date.now()}-${i}`,
       { cache: 'no-store' },
     );
@@ -56,7 +73,7 @@ async function measureUpload(): Promise<number[]> {
   for (let i = 0; i < RUNS; i++) {
     const start = performance.now();
 
-    const response = await fetch(
+    const response = await fetchWithTimeout(
       `https://speed.cloudflare.com/__up?_=${Date.now()}-${i}`,
       {
         method: 'POST',
@@ -83,7 +100,7 @@ async function measurePing(): Promise<number> {
 
   for (let i = 0; i < 8; i++) {
     const start = performance.now();
-    const response = await fetch(
+    const response = await fetchWithTimeout(
       `https://speed.cloudflare.com/__down?bytes=0&_=${Date.now()}-ping-${i}`,
       { cache: 'no-store' },
     );
@@ -168,7 +185,7 @@ export default function CloudflareCompare() {
         )}
 
         <p className="fineprint">
-          This comparison transfers up to about 150 MB. Cloudflare&apos;s
+          This comparison transfers up to about 60 MB. Cloudflare&apos;s
           network selects the edge location through its anycast/BGP routing.
         </p>
       </div>
