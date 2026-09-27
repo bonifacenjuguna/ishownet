@@ -17,7 +17,7 @@ A browser-based internet speed test that measures real connection performance.
 
 ## How it works
 
-The browser talks to small same-origin Edge endpoints for ping, download, upload, and connection metadata. Throughput uses adaptive parallel requests and measures sustained transfer performance rather than displaying invented frontend values.
+The browser runs the measurement engine directly against Cloudflare's edge network. The official Cloudflare speedtest engine measures download/upload throughput, unloaded and loaded latency, jitter, and packet loss without routing test traffic through Vercel. Connection metadata comes from Cloudflare's speed-test metadata endpoint.
 
 Results and history stay in the browser. No account or environment variables are required.
 
@@ -37,12 +37,6 @@ app/
   page.tsx
   layout.tsx
   globals.css
-  api/
-    ping/route.ts
-    download/route.ts
-    upload/route.ts
-    meta/route.ts
-
 components/
   Header.tsx
   Footer.tsx
@@ -62,8 +56,6 @@ hooks/
 
 lib/
   engine.ts
-  edgeHandlers.ts
-  constants.ts
   format.ts
   storage.ts
   types.ts
