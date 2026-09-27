@@ -1,30 +1,103 @@
 'use client';
 
-import { useRef, useState } from 'react';
-import SpeedTest from '@cloudflare/speedtest';
+import { useState } from 'react';
 
 interface CloudflareResult {
   downloadMbps: number;
   uploadMbps: number;
   pingMs: number;
-  jitterMs: number;
-  downloadLatencyMs: number;
-  uploadLatencyMs: number;
 }
 
-function toMbps(bps: number): number {
-  return bps / 1_000_000;
+const DOWNLOAD_BYTES = 25_000_000;
+const UPLOAD_BYTES = 25_000_000;
+const RUNS = 3;
+
+function median(values: number[]): number {
+  const sorted = [...values].sort((a, b) => a - b);
+  return sorted[Math.floor(sorted.length / 2)] ?? 0;
 }
 
-function safeNumber(value: number): number {
-  return Number.isFinite(value) && value >= 0 ? value : 0;
+async function measureDownload(): Promise<number[]> {
+  const rates: number[] = [];
+
+  for (let i = 0; i < RUNS; i++) {
+    const start = performance.now();
+    const response = await fetch(
+      `https://speed.cloudflare.com/__down?bytes=${DOWNLOAD_BYTES}&_=${Date.now()}-${i}`,
+      { cache: 'no-store' },
+    );
+
+    if (!response.ok || !response.body) {
+      throw new Error('Cloudflare download request failed.');
+    }
+
+    const reader = response.body.getReader();
+    let bytes = 0;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      bytes += value.byteLength;
+    }
+
+    const seconds = (performance.now() - start) / 1000;
+    if (seconds > 0 && bytes > 0) {
+      rates.push((bytes * 8) / 1_000_000 / seconds);
+    }
+  }
+
+  return rates;
+}
+
+async function measureUpload(): Promise<number[]> {
+  const payload = new Uint8Array(UPLOAD_BYTES);
+  const rates: number[] = [];
+
+  for (let i = 0; i < RUNS; i++) {
+    const start = performance.now();
+
+    const response = await fetch(
+      `https://speed.cloudflare.com/__up?_=${Date.now()}-${i}`,
+      {
+        method: 'POST',
+        body: payload,
+        cache: 'no-store',
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error('Cloudflare upload request failed.');
+    }
+
+    const seconds = (performance.now() - start) / 1000;
+    if (seconds > 0) {
+      rates.push((UPLOAD_BYTES * 8) / 1_000_000 / seconds);
+    }
+  }
+
+  return rates;
+}
+
+async function measurePing(): Promise<number> {
+  const samples: number[] = [];
+
+  for (let i = 0; i < 8; i++) {
+    const start = performance.now();
+    const response = await fetch(
+      `https://speed.cloudflare.com/__down?bytes=0&_=${Date.now()}-ping-${i}`,
+      { cache: 'no-store' },
+    );
+
+    if (response.ok) samples.push(performance.now() - start);
+  }
+
+  return median(samples);
 }
 
 export default function CloudflareCompare() {
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState<CloudflareResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const testRef = useRef<SpeedTest | null>(null);
 
   async function runComparison() {
     if (running) return;
@@ -34,40 +107,22 @@ export default function CloudflareCompare() {
     setResult(null);
 
     try {
-      const test = new SpeedTest({
-        autoStart: false,
-        measurements: [
-          { type: 'latency', numPackets: 12 },
-          { type: 'download', bytes: 100_000_000, count: 3 },
-          { type: 'upload', bytes: 50_000_000, count: 3 },
-        ],
-        measureDownloadLoadedLatency: true,
-        measureUploadLoadedLatency: true,
-        bandwidthMinRequestDuration: 100,
-      });
+      const pingMs = await measurePing();
+      const download = await measureDownload();
+      const upload = await measureUpload();
 
-      testRef.current = test;
-
-      await new Promise<void>((resolve, reject) => {
-        test.onFinish = () => resolve();
-        test.onError = (message) => reject(new Error(message));
-        test.play();
-      });
-
-      const results = test.results;
+      if (!download.length || !upload.length || !pingMs) {
+        throw new Error('Cloudflare did not return enough measurements.');
+      }
 
       setResult({
-        downloadMbps: safeNumber(toMbps(results.getDownloadBandwidth())),
-        uploadMbps: safeNumber(toMbps(results.getUploadBandwidth())),
-        pingMs: safeNumber(results.getUnloadedLatency()),
-        jitterMs: safeNumber(results.getUnloadedJitter()),
-        downloadLatencyMs: safeNumber(results.getDownLoadedLatency()),
-        uploadLatencyMs: safeNumber(results.getUpLoadedLatency()),
+        downloadMbps: median(download),
+        uploadMbps: median(upload),
+        pingMs,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Cloudflare comparison failed.');
     } finally {
-      testRef.current = null;
       setRunning(false);
     }
   }
@@ -79,9 +134,9 @@ export default function CloudflareCompare() {
           <p className="eyebrow">Secondary measurement</p>
           <h2>Compare with Cloudflare</h2>
           <p>
-            Run a separate browser test against Cloudflare&apos;s edge network.
-            This does not replace your iShowNet result — it gives us a second
-            measurement path to compare.
+            Run a separate browser test directly against Cloudflare&apos;s edge
+            network. It does not replace your iShowNet result; it gives us a
+            second measurement path to compare.
           </p>
         </div>
 
@@ -109,24 +164,12 @@ export default function CloudflareCompare() {
               <strong>{result.pingMs.toFixed(1)} ms</strong>
               <span>Ping</span>
             </div>
-            <div>
-              <strong>{result.jitterMs.toFixed(1)} ms</strong>
-              <span>Jitter</span>
-            </div>
-            <div>
-              <strong>{result.downloadLatencyMs.toFixed(1)} ms</strong>
-              <span>Loaded download</span>
-            </div>
-            <div>
-              <strong>{result.uploadLatencyMs.toFixed(1)} ms</strong>
-              <span>Loaded upload</span>
-            </div>
           </div>
         )}
 
         <p className="fineprint">
-          Cloudflare&apos;s engine runs the measurement directly from your browser
-          against Cloudflare&apos;s edge network. Results are for comparison only.
+          This comparison transfers up to about 150 MB. Cloudflare&apos;s
+          network selects the edge location through its anycast/BGP routing.
         </p>
       </div>
     </section>
