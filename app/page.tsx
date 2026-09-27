@@ -217,8 +217,8 @@ export default function Home() {
   const greatCount = activities ? activities.filter((a) => a.level === 'great').length : 0;
 
   const locationText = [result?.city, result?.country].filter(Boolean).join(', ');
-  const ipText = result?.ip ?? meta?.ip ?? null;
-  const asnText = result?.asn ?? meta?.asn ?? null;
+  const ipText = result?.ip ?? null;
+  const asnText = result?.asn ?? null;
   const dataUsed = result && result.bytesDown !== undefined ? formatBytes((result.bytesDown ?? 0) + (result.bytesUp ?? 0)) : null;
 
   const steps: { key: 'download' | 'upload' | 'ping' | 'connection'; label: string; value: string | null; state: 'pending' | 'active' | 'done' }[] = [
