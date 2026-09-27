@@ -8,7 +8,7 @@ export interface TestResult {
   regionLabel: string;
   pingMs: number;
   jitterMs: number;
-  packetLossPct: number;
+  packetLossPct: number | null;
   downloadMbps: number;
   uploadMbps: number;
   downloadLatencyMs: number;
