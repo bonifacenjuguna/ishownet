@@ -2,6 +2,14 @@ import type { TestPhase, TestResult } from './types';
 
 const META_URL = 'https://speed.cloudflare.com/meta';
 
+type CloudflareMeta = {
+  clientIp?: string;
+  asn?: number;
+  colo?: string;
+  country?: string;
+  city?: string;
+};
+
 type Callbacks = {
   onPhase?: (phase: TestPhase) => void;
   onLive?: (phase: 'download' | 'upload', mbps: number) => void;
@@ -29,7 +37,13 @@ type Engine = {
   play: () => void;
 };
 
-const MEASUREMENTS = [
+const MEASUREMENTS: Array<{
+  type: 'latency' | 'download' | 'upload';
+  numPackets?: number;
+  bytes?: number;
+  count?: number;
+  bypassMinDuration?: boolean;
+}> = [
   { type: 'latency', numPackets: 1 },
   { type: 'download', bytes: 1e5, count: 1, bypassMinDuration: true },
   { type: 'latency', numPackets: 20 },
@@ -46,20 +60,14 @@ const MEASUREMENTS = [
   { type: 'download', bytes: 2.5e8, count: 2 },
 ];
 
-async function fetchMeta() {
+async function fetchMeta(): Promise<CloudflareMeta> {
   try {
     const controller = new AbortController();
     const timer = window.setTimeout(() => controller.abort(), 5000);
     try {
       const response = await fetch(META_URL, { cache: 'no-store', signal: controller.signal });
       if (!response.ok) return {};
-      return await response.json() as {
-        clientIp?: string;
-        asn?: number;
-        colo?: string;
-        country?: string;
-        city?: string;
-      };
+      return await response.json() as CloudflareMeta;
     } finally {
       window.clearTimeout(timer);
     }
