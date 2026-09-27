@@ -1,23 +1,27 @@
 # iShowNet
 
-A browser-based internet speed test that measures real connection performance.
+A browser-based internet speed and connection-quality test powered by Cloudflare's edge network.
 
 **Live:** https://ishownet.vercel.app
 
 ## Measures
 
 - Ping and jitter
-- Packet loss estimate
 - Download and upload throughput
 - Latency while the connection is under load
 - Bufferbloat grade
-- Network type, IP, ASN, and edge location
+- Cloudflare edge location, IP, ASN, city, and country
+- Network type
 - Local test history
 - Practical activity guidance for calls, streaming, gaming, cloud gaming, and live streaming
 
+Packet loss is currently not shown because Cloudflare's browser engine requires a separately configured TURN service for that measurement. iShowNet does not fake a zero value.
+
 ## How it works
 
-The browser runs the measurement engine directly against Cloudflare's edge network. The official Cloudflare speedtest engine measures download/upload throughput, unloaded and loaded latency, jitter, and packet loss without routing test traffic through Vercel. Connection metadata comes from Cloudflare's speed-test metadata endpoint.
+The browser runs Cloudflare's official `@cloudflare/speedtest` engine directly against Cloudflare's edge network. The engine performs latency, download, upload, and loaded-latency measurements using the same measurement technology that powers Cloudflare's speed test.
+
+The app keeps the presentation layer, history, themes, PWA experience, and practical guidance while Cloudflare handles the network measurement path.
 
 Results and history stay in the browser. No account or environment variables are required.
 
@@ -29,37 +33,6 @@ npm run dev
 ```
 
 Open http://localhost:3000.
-
-## Project structure
-
-```
-app/
-  page.tsx
-  layout.tsx
-  globals.css
-components/
-  Header.tsx
-  Footer.tsx
-  Logo.tsx
-  ThemeToggle.tsx
-  SpeedRing.tsx
-  Waveform.tsx
-  StatCard.tsx
-  ActivityList.tsx
-  HistoryGraph.tsx
-  HistoryList.tsx
-  ResultCard.tsx
-  icons.tsx
-
-hooks/
-  useSynchronizedMetric.ts
-
-lib/
-  engine.ts
-  format.ts
-  storage.ts
-  types.ts
-```
 
 ## Deployment
 
