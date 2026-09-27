@@ -16,7 +16,6 @@ type Results = {
   getUpLoadedLatency: () => number | undefined;
   getDownloadBandwidth: () => number | undefined;
   getUploadBandwidth: () => number | undefined;
-  getPacketLoss: () => number | undefined;
   getDownloadBandwidthPoints: () => Array<{ transferSize: number }>;
   getUploadBandwidthPoints: () => Array<{ transferSize: number }>;
 };
@@ -29,6 +28,23 @@ type Engine = {
   onError: (message: string) => void;
   play: () => void;
 };
+
+const MEASUREMENTS = [
+  { type: 'latency', numPackets: 1 },
+  { type: 'download', bytes: 1e5, count: 1, bypassMinDuration: true },
+  { type: 'latency', numPackets: 20 },
+  { type: 'download', bytes: 1e5, count: 9 },
+  { type: 'download', bytes: 1e6, count: 8 },
+  { type: 'upload', bytes: 1e5, count: 8 },
+  { type: 'upload', bytes: 1e6, count: 6 },
+  { type: 'download', bytes: 1e7, count: 6 },
+  { type: 'upload', bytes: 1e7, count: 4 },
+  { type: 'download', bytes: 2.5e7, count: 4 },
+  { type: 'upload', bytes: 2.5e7, count: 4 },
+  { type: 'download', bytes: 1e8, count: 3 },
+  { type: 'upload', bytes: 5e7, count: 3 },
+  { type: 'download', bytes: 2.5e8, count: 2 },
+];
 
 async function fetchMeta() {
   try {
@@ -85,6 +101,7 @@ export function runFullTest(callbacks: Callbacks = {}): Promise<TestResult> {
 
       const engine = new SpeedTest({
         autoStart: false,
+        measurements: MEASUREMENTS,
         logMeasurementApiUrl: null,
         logAimApiUrl: null,
       }) as unknown as Engine;
@@ -132,7 +149,6 @@ export function runFullTest(callbacks: Callbacks = {}): Promise<TestResult> {
       };
 
       engine.onResultsChange = publish;
-
       engine.onError = (message) => reject(new Error(message || 'Cloudflare speed test failed.'));
 
       engine.onFinish = (r) => {
@@ -142,7 +158,6 @@ export function runFullTest(callbacks: Callbacks = {}): Promise<TestResult> {
         const up = (r.getUploadBandwidth() ?? lastUp * 1e6) / 1e6;
         const downLatency = r.getDownLoadedLatency() ?? ping;
         const upLatency = r.getUpLoadedLatency() ?? ping;
-        const loss = r.getPacketLoss();
 
         if (!ping || !down || !up) {
           reject(new Error('Cloudflare did not return a complete speed test result.'));
@@ -163,7 +178,7 @@ export function runFullTest(callbacks: Callbacks = {}): Promise<TestResult> {
           regionLabel: meta.colo ? `Cloudflare edge · ${meta.colo}` : 'Cloudflare edge',
           pingMs: ping,
           jitterMs: finalJitter,
-          packetLossPct: typeof loss === 'number' ? loss * 100 : 0,
+          packetLossPct: null,
           downloadMbps: down,
           uploadMbps: up,
           downloadLatencyMs: downLatency,
