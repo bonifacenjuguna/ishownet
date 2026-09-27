@@ -6,7 +6,9 @@ interface Options {
 }
 
 export function useSynchronizedMetric(initial = 0, options: Options = {}) {
-  const tauMs = options.tauMs ?? 320;
+  // Live samples should feel responsive while still avoiding visible jumps.
+  // Final values keep the slower soft landing for a clean finish.
+  const tauMs = options.tauMs ?? 120;
   const settleTauMs = options.settleTauMs ?? 700;
   const [value, setValue] = useState(initial);
   const valueRef = useRef(initial);
@@ -47,7 +49,7 @@ export function useSynchronizedMetric(initial = 0, options: Options = {}) {
         }
         tauRef.current = tauMs;
       } else {
-        // Live samples use the normal response time. The locked final
+        // Live samples use a responsive transition. The locked final
         // measurement gets a slower soft landing so the gauge never
         // visually snaps to the final average.
         const alpha = 1 - Math.exp(-dt / tau);
