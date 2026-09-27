@@ -137,7 +137,7 @@ function drawCard(canvas: HTMLCanvasElement, result: TestResult, unit: SpeedUnit
   const metrics: [string, string][] = [
     ['Ping', `${formatMs(result.pingMs)} ms`],
     ['Jitter', `${formatMs(result.jitterMs, 1)} ms`],
-    ['Packet loss', `${result.packetLossPct.toFixed(1)}%`],
+    ['Packet loss', result.packetLossPct === null ? 'Not measured' : `${result.packetLossPct.toFixed(1)}%`],
     ['Bufferbloat', `${result.bufferbloatGrade}  ·  +${formatMs(result.bufferbloatMs)} ms`],
     ['Download latency', `${formatMs(result.downloadLatencyMs)} ms`],
     ['Upload latency', `${formatMs(result.uploadLatencyMs)} ms`],
