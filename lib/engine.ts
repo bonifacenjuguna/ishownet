@@ -37,7 +37,6 @@ type Engine = {
   play: () => void;
 };
 
-
 async function fetchMeta(): Promise<CloudflareMeta> {
   try {
     const controller = new AbortController();
@@ -111,6 +110,15 @@ export function runFullTest(callbacks: Callbacks = {}): Promise<TestResult> {
       let lastUp = 0;
       let lastPing = 0;
       let lastJitter = 0;
+      let uploadStartedAt = 0;
+      let uploadTicker: number | null = null;
+
+      const stopUploadTicker = () => {
+        if (uploadTicker !== null) {
+          window.clearInterval(uploadTicker);
+          uploadTicker = null;
+        }
+      };
 
       const publish = () => {
         const r = engine.results;
@@ -123,10 +131,25 @@ export function runFullTest(callbacks: Callbacks = {}): Promise<TestResult> {
           lastDown = down / 1e6;
           callbacks.onLive?.('download', lastDown);
         }
+
         if (typeof up === 'number' && up > 0) {
           lastUp = up / 1e6;
           callbacks.onLive?.('upload', lastUp);
+        } else if (uploadStartedAt > 0) {
+          // Cloudflare can spend a while in an upload measurement without
+          // exposing a new bandwidth value. Use bytes already transferred by
+          // the engine to keep the UI visibly live without inventing samples.
+          const elapsedSeconds = (performance.now() - uploadStartedAt) / 1000;
+          const uploadBytes = transferred(r.getUploadBandwidthPoints());
+          if (uploadBytes > 0 && elapsedSeconds > 0.15) {
+            const liveMbps = (uploadBytes * 8) / elapsedSeconds / 1e6;
+            if (Number.isFinite(liveMbps) && liveMbps > 0) {
+              lastUp = liveMbps;
+              callbacks.onLive?.('upload', liveMbps);
+            }
+          }
         }
+
         if (typeof ping === 'number' && ping > 0) {
           lastPing = ping;
           lastJitter = typeof jitter === 'number' ? jitter : lastJitter;
@@ -142,15 +165,24 @@ export function runFullTest(callbacks: Callbacks = {}): Promise<TestResult> {
           callbacks.onPhase?.('download');
         } else if (measurement.type === 'upload' && !sawUpload) {
           sawUpload = true;
+          uploadStartedAt = performance.now();
+          stopUploadTicker();
+          uploadTicker = window.setInterval(publish, 120);
           if (lastDown > 0) callbacks.onStage?.('download', lastDown);
           callbacks.onPhase?.('upload');
+          publish();
         }
       };
 
       engine.onResultsChange = publish;
-      engine.onError = (message) => reject(new Error(message || 'Cloudflare speed test failed.'));
+      engine.onError = (message) => {
+        stopUploadTicker();
+        reject(new Error(message || 'Cloudflare speed test failed.'));
+      };
 
       engine.onFinish = (r) => {
+        stopUploadTicker();
+
         const ping = r.getUnloadedLatency() ?? lastPing;
         const jitter = r.getUnloadedJitter();
         const down = (r.getDownloadBandwidth() ?? lastDown * 1e6) / 1e6;
