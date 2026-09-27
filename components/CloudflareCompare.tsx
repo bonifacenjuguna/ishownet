@@ -13,12 +13,18 @@ const UPLOAD_BYTES = 10_000_000;
 const RUNS = 3;
 const REQUEST_TIMEOUT_MS = 30_000;
 
-async function fetchWithTimeout(input: RequestInfo | URL, init: RequestInit = {}): Promise<Response> {
+async function fetchWithTimeout(
+  input: RequestInfo | URL,
+  init: RequestInit = {},
+  consume?: (response: Response) => Promise<void>,
+): Promise<Response> {
   const controller = new AbortController();
   const timer = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   try {
-    return await fetch(input, { ...init, signal: controller.signal });
+    const response = await fetch(input, { ...init, signal: controller.signal });
+    if (consume) await consume(response);
+    return response;
   } catch (error) {
     if (controller.signal.aborted) {
       throw new Error('Cloudflare request timed out.');
@@ -39,23 +45,23 @@ async function measureDownload(): Promise<number[]> {
 
   for (let i = 0; i < RUNS; i++) {
     const start = performance.now();
+    let bytes = 0;
     const response = await fetchWithTimeout(
       `https://speed.cloudflare.com/__down?bytes=${DOWNLOAD_BYTES}&_=${Date.now()}-${i}`,
       { cache: 'no-store' },
+      async (response) => {
+        if (!response.ok || !response.body) {
+          throw new Error('Cloudflare download request failed.');
+        }
+
+        const reader = response.body.getReader();
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          bytes += value.byteLength;
+        }
+      },
     );
-
-    if (!response.ok || !response.body) {
-      throw new Error('Cloudflare download request failed.');
-    }
-
-    const reader = response.body.getReader();
-    let bytes = 0;
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      bytes += value.byteLength;
-    }
 
     const seconds = (performance.now() - start) / 1000;
     if (seconds > 0 && bytes > 0) {
