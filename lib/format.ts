@@ -62,7 +62,7 @@ type ActivityMetrics = {
   up: number;
   ping: number;
   jitter: number;
-  loss: number;
+  loss: number | null;
   downloadLatency?: number;
   uploadLatency?: number;
   bufferbloat?: number;
@@ -80,7 +80,8 @@ export function buildActivities(r: ActivityMetrics): Activity[] {
   const up = Math.max(0, r.up);
   const ping = Math.max(0, r.ping);
   const jitter = Math.max(0, r.jitter);
-  const loss = Math.max(0, r.loss);
+  const loss = r.loss === null ? null : Math.max(0, r.loss);
+  const lossBelow = (threshold: number) => loss === null || loss < threshold;
   const downLatency = Math.max(0, r.downloadLatency ?? ping);
   const upLatency = Math.max(0, r.uploadLatency ?? ping);
   const loadedLatency = Math.max(downLatency, upLatency);
@@ -94,8 +95,8 @@ export function buildActivities(r: ActivityMetrics): Activity[] {
       name: 'Social & messaging',
       need: 'Emails, chats, posts, reels, stories & DMs',
       level: pick(
-        down >= 2 && up >= 0.5 && loss < 1,
-        down >= 0.5 && up >= 0.1 && loss < 5
+        down >= 2 && up >= 0.5 && lossBelow(1),
+        down >= 0.5 && up >= 0.1 && lossBelow(5)
       ),
     },
     {
@@ -103,8 +104,8 @@ export function buildActivities(r: ActivityMetrics): Activity[] {
       name: 'Video calls',
       need: 'Zoom, Meet, Teams in HD',
       level: pick(
-        down >= 8 && up >= 4 && ping < 80 && jitter < 20 && loss < 1 && loadedLatency < 120,
-        down >= 3 && up >= 1.5 && ping < 180 && jitter < 45 && loss < 3 && loadedLatency < 220
+        down >= 8 && up >= 4 && ping < 80 && jitter < 20 && lossBelow(1) && loadedLatency < 120,
+        down >= 3 && up >= 1.5 && ping < 180 && jitter < 45 && lossBelow(3) && loadedLatency < 220
       ),
     },
     {
@@ -112,8 +113,8 @@ export function buildActivities(r: ActivityMetrics): Activity[] {
       name: 'HD streaming',
       need: '1080p on Netflix, YouTube',
       level: pick(
-        down >= 10 && loss < 2 && bufferbloat < 120,
-        down >= 5 && loss < 5
+        down >= 10 && lossBelow(2) && bufferbloat < 120,
+        down >= 5 && lossBelow(5)
       ),
     },
     {
@@ -121,8 +122,8 @@ export function buildActivities(r: ActivityMetrics): Activity[] {
       name: '4K streaming',
       need: 'Ultra HD, about 15 Mbps',
       level: pick(
-        down >= 25 && loss < 2 && bufferbloat < 120,
-        down >= 15 && loss < 5
+        down >= 25 && lossBelow(2) && bufferbloat < 120,
+        down >= 15 && lossBelow(5)
       ),
     },
     {
@@ -130,8 +131,8 @@ export function buildActivities(r: ActivityMetrics): Activity[] {
       name: 'Online gaming',
       need: 'Low ping and steady jitter',
       level: pick(
-        down >= 5 && up >= 2 && ping < 50 && jitter < 15 && loss < 1 && loadedLatency < 100,
-        down >= 3 && up >= 1 && ping < 100 && jitter < 35 && loss < 3 && loadedLatency < 180
+        down >= 5 && up >= 2 && ping < 50 && jitter < 15 && lossBelow(1) && loadedLatency < 100,
+        down >= 3 && up >= 1 && ping < 100 && jitter < 35 && lossBelow(3) && loadedLatency < 180
       ),
     },
     {
@@ -139,8 +140,8 @@ export function buildActivities(r: ActivityMetrics): Activity[] {
       name: 'Cloud gaming',
       need: 'GeForce NOW, Xbox Cloud',
       level: pick(
-        down >= 35 && up >= 5 && ping < 50 && jitter < 15 && loss < 1 && loadedLatency < 100 && bufferbloat < 40,
-        down >= 15 && up >= 3 && ping < 90 && jitter < 30 && loss < 3 && loadedLatency < 180 && bufferbloat < 90
+        down >= 35 && up >= 5 && ping < 50 && jitter < 15 && lossBelow(1) && loadedLatency < 100 && bufferbloat < 40,
+        down >= 15 && up >= 3 && ping < 90 && jitter < 30 && lossBelow(3) && loadedLatency < 180 && bufferbloat < 90
       ),
     },
     {
@@ -148,8 +149,8 @@ export function buildActivities(r: ActivityMetrics): Activity[] {
       name: 'Live streaming',
       need: 'Going live in 1080p',
       level: pick(
-        up >= 10 && upLatency < 120 && loss < 1 && jitter < 20,
-        up >= 5 && upLatency < 220 && loss < 3 && jitter < 40
+        up >= 10 && upLatency < 120 && lossBelow(1) && jitter < 20,
+        up >= 5 && upLatency < 220 && lossBelow(3) && jitter < 40
       ),
     },
   ];
