@@ -102,8 +102,6 @@ export function runFullTest(callbacks: Callbacks = {}): Promise<TestResult> {
       const engine = new SpeedTest({
         autoStart: false,
         measurements: MEASUREMENTS,
-        logMeasurementApiUrl: null,
-        logAimApiUrl: null,
       }) as unknown as Engine;
 
       let sawDownload = false;
